@@ -4,7 +4,7 @@
 
 # Erudit
 
-**Stay in the original. See only the words that are actually above your level.**
+**Finds new words in what you read and repeats them in pages in your own language until they stick.**
 
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
 [![Manifest](https://img.shields.io/badge/manifest-v3-informational)](manifest.config.ts)
@@ -15,15 +15,20 @@
 
 </div>
 
-Erudit is a browser extension (Manifest V3, Chrome and Firefox) that reads the page you are on,
-picks out the words and phrases above your CEFR level, translates them, highlights them in place
-and files them into a dictionary with spaced repetition and Anki export.
+Erudit is a Chrome and Firefox extension where words stick because you keep meeting them
+while reading. You read an article in the original, and the extension highlights the words
+above your CEFR level with a translation right in the text. You save the ones you want. Later
+you open the news in your own language, and those same words meet you there: they stand in
+place of their translations, and a card asks whether you remembered them. Every such meeting
+moves the word along the spaced-repetition intervals, like Anki, but without flashcards or
+a separate study session.
 
-Any page with text will do — an article, a docs page, a Reddit thread, a chapter of a book — and
-only on the sites you explicitly allow.
+Works right after installing, with no keys and no subscription. Any page with text will do:
+an article, a docs page, a Reddit thread, a chapter of a book. It only runs on the sites you
+allow yourself.
 
-> **Status: 0.0.4.** Not in the extension stores yet, so it is installed from source.
-> Everything described below works; what is missing is listed under [Roadmap](#roadmap).
+> **Version 0.0.7.** Not in the extension stores yet, so it is installed from source.
+> Everything described below works. What is still missing is listed under [Roadmap](#roadmap).
 
 <p align="center">
   <img src="landing/img/overlay.png" width="840"
@@ -32,32 +37,33 @@ only on the sites you explicitly allow.
 
 ## Why another one
 
-A page translator replaces the original, so you stop reading the language you are learning.
+A page translator replaces the whole text, so you stop reading the language you are learning.
 A click-to-translate dictionary translates whatever you click, including the hundred words you
-already know. Erudit does neither: it leaves the original alone and touches only what is above
-the level you set.
+already know. Erudit leaves the original as it is and only touches the words above the level
+you set.
 
-That level is yours, not a constant baked into the code. Set it to B1 and B2 words light up;
-set it to C1 and the page goes almost quiet.
+You set that level yourself. Set it to B1 and B2 words light up. Set it to C1 and the page
+goes almost quiet.
 
 ## What it does
 
-- **CEFR level as the filter.** You say what you read at; everything below that stays untouched.
-- **Works before you configure anything.** Out of the box the words are picked by an offline
-  CEFR profile (8833 English entries) and translated by a dictionary. No key, no account,
-  no payment. A language model is an upgrade, not a prerequisite.
+- **CEFR level as the filter.** You say what level you read at, and everything below it is
+  left alone.
+- **Works before you configure anything.** Out of the box an offline CEFR profile
+  (8833 English entries) picks the words and a dictionary translates them. No key, no account,
+  no payment. A language model can be added later.
 - **Your model, your keys.** OpenAI-compatible APIs, Anthropic Messages and Google Gemini,
-  including a model running on your own machine through LM Studio, Ollama or llama.cpp.
-  Nothing is sent to a server of ours, because there is no server of ours.
-- **Highlighting in the text itself.** Yellow for new words, green for the ones already saved.
-  Hovering shows a card with the level, the translation, the transcription and a definition;
-  clicking scrolls the page to the next occurrence.
-- **A dictionary that leads somewhere.** Saved words go into spaced repetition (1, 3, 7, 16, 35
-  and 90 days) and export to Anki as a proper `.apkg` deck — import back works too.
+  including a model on your own machine through LM Studio, Ollama or llama.cpp. The extension
+  has no server of its own, so your data only goes to the provider you picked.
+- **Highlighting in the text itself.** Yellow marks new words, green marks the ones already
+  saved. Hovering shows a card with the level, the translation, the transcription and
+  a definition. Clicking scrolls the page to the next occurrence.
+- **A dictionary with spaced repetition.** Saved words go into review intervals (1, 3, 7, 16,
+  35 and 90 days) and export to Anki as a regular `.apkg` deck. Import back works too.
 - **Only where you allow it.** The content script mounts on the sites in your list and nowhere
-  else. `reddit.com` is there by default; add or remove from the popup in one click.
-- **Six interface languages** — English, Russian, Spanish, Portuguese, Chinese, Korean — chosen
-  independently of the language you are reading.
+  else. `reddit.com` is there by default. Adding or removing a site is one click in the popup.
+- **Six interface languages:** English, Russian, Spanish, Portuguese, Chinese and Korean.
+  The interface language does not depend on the language you read.
 
 <p align="center">
   <img src="landing/img/dictionary.png" width="840"
@@ -72,7 +78,7 @@ set it to C1 and the page goes almost quiet.
 ## Install
 
 The extension is not in the Chrome Web Store or on AMO yet, so it is built from source.
-Node.js 20 or newer is required.
+You need Node.js 20 or newer.
 
 ```bash
 git clone https://github.com/Hakoba/erudit
@@ -87,14 +93,14 @@ pick `dist/chrome`.
 **Firefox:** open `about:debugging#/runtime/this-firefox`, press *Load Temporary Add-on*
 and pick any file inside `dist/firefox`. Firefox drops temporary add-ons when it restarts.
 
-After installing, a setup page opens: pick your level and language pair, check the list of
-sites, and open any allowed page.
+After installing, a setup page opens. Pick your level and language pair, check the list of
+sites and open any allowed page.
 
 ## Configuration
 
-Everything lives in the extension options, split into four sections. Nothing is hardcoded and
-no key ever leaves your browser. A step-by-step guide for the two setups — fully free, and
-with a model — is in [docs/SETUP.md](docs/SETUP.md) (Russian).
+All settings sit in four sections of the extension options page. Nothing is hardcoded and
+no key ever leaves your browser. A step-by-step guide for both setups, fully free and with
+a model, is in [docs/SETUP.md](docs/SETUP.md) (Russian).
 
 ### Who finds the words
 
@@ -105,7 +111,7 @@ with a model — is in [docs/SETUP.md](docs/SETUP.md) (Russian).
 | Finds | single English words | words and phrases, in context, with explanations |
 | Languages | English only | any |
 
-The profile is the default. Switch to a model in **Reading → Who finds the hard words**.
+The profile is the default. To switch to a model, open **Reading → Who finds the hard words**.
 
 ### Model
 
@@ -116,33 +122,35 @@ The profile is the default. Switch to a model in **Reading → Who finds the har
 | OpenAI, OpenRouter, Groq, DeepSeek, Mistral | preset buttons | preset buttons | provider key |
 | Anthropic, Google Gemini | own request format, pick the API kind | | provider key |
 
-There is a *Check connection* button that sends one short request and reports the response
-time or the exact error the overlay would have shown.
+There is a *Check connection* button next to the fields. It sends one short request and shows
+the response time or the same error the overlay would have shown.
 
 ### Dictionaries and translators
 
-Single words are translated by a dictionary rather than a model — it is faster and costs
-nothing. Out of the box that is MyMemory; [Yandex Dictionary](https://yandex.ru/dev/dictionary/)
-gives full entries with transcription if you already have its key (Yandex no longer issues
-new ones); [dictionaryapi.dev](https://dictionaryapi.dev/) gives definitions without one.
-Phrases can go through DeepL or LibreTranslate before the model is involved.
+Single words are translated by a dictionary, which is faster than a model and free. Out of
+the box that is MyMemory. [Yandex Dictionary](https://yandex.ru/dev/dictionary/) gives full
+entries with transcription if you already have its key (Yandex no longer issues new ones).
+[dictionaryapi.dev](https://dictionaryapi.dev/) gives definitions without any key. Phrases can
+go through DeepL or LibreTranslate first, and only then to the model.
 
 ## How it works
 
-1. The content script mounts only on an allowed address and renders its overlay inside a
-   Shadow DOM, so the site's own layout is never touched.
-2. The readable text is located by one of three sources, in order of confidence: an area you
-   picked by hand, a built-in rule for the site (there are three: Reddit, WebNovel, RoyalRoad), or a
-   text-density score that penalises link-heavy blocks and so skips menus and "read also".
+1. The content script mounts only on an allowed address and renders its overlay inside
+   a Shadow DOM, so the site's own layout is never touched.
+2. The readable text comes from one of three sources, from most to least trusted. First,
+   an area you picked by hand. Then a built-in rule for the site (there are three: Reddit,
+   WebNovel, RoyalRoad). If neither exists, a text-density score picks the block: it
+   penalises link-heavy blocks and so skips menus and "read also".
 3. That text goes either to the offline profile or to your model. The reply is parsed, words
    below your level are dropped, and the rest are highlighted in place.
-4. Saved words live in `storage.local`, settings in `storage.sync`. Requests leave through the
-   background worker — a content script on an HTTPS page cannot reach a local model over HTTP.
+4. Saved words live in `storage.local`, settings in `storage.sync`. Requests leave through
+   the background worker, because a content script on an HTTPS page cannot reach a local
+   model over HTTP.
 
 Every feature, setting and gotcha is covered question by question in
-[docs/FAQ.md](docs/FAQ.md) (in Russian). More detail on the code is in
-[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md); the current state of every feature
-is in [docs/projectInfo.md](docs/projectInfo.md).
+[docs/FAQ.md](docs/FAQ.md) (in Russian). The code is described in
+[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md), and the current state of every feature
+in [docs/projectInfo.md](docs/projectInfo.md).
 
 ## Development
 
@@ -160,11 +168,11 @@ npm run launch         # launch a browser with the extension loaded
 ```
 
 Vue 3 with `<script setup>`, TypeScript, Vite, Pinia, PrimeVue and Tailwind 4.
-Conventions are in [.junie/guidelines.md](.junie/guidelines.md); simplifications that were made
-deliberately, with the condition for revisiting each, are in [deferred.md](deferred.md).
+Conventions are in [.junie/guidelines.md](.junie/guidelines.md). Deliberate simplifications,
+each with the condition for revisiting it, are in [deferred.md](deferred.md).
 
-Logic with branches lives in modules free of browser APIs and is covered by tests next to the
-code — `llmParse.ts` and `matchesSite.ts` are the models to follow.
+Logic with branches lives in modules free of browser APIs and is covered by tests next to
+the code. `llmParse.ts` and `matchesSite.ts` are the examples to follow.
 
 ## Roadmap
 
@@ -175,10 +183,10 @@ code — `llmParse.ts` and `matchesSite.ts` are the models to follow.
 
 ## Contributing
 
-Pull requests are welcome, and the cheapest useful one is a rule for a site the extractor gets
-wrong: it is a host and a list of selectors in
-[`src/utils/extract/rules.ts`](src/utils/extract/rules.ts), plus a line in the test next to it.
-That single entry then works for everyone.
+Pull requests are welcome. The most useful of the easy ones is a rule for a site where the
+extractor picks the wrong block. It is a host and a list of selectors in
+[`src/utils/extract/rules.ts`](src/utils/extract/rules.ts), plus a line in the test next to
+it. After that the site works for everyone.
 
 Questions: [Telegram group](https://t.me/erudit_extension).
 Bugs and ideas: [GitHub issues](https://github.com/Hakoba/erudit/issues)
@@ -204,5 +212,5 @@ template.
 
 ## License
 
-[GPL-3.0-or-later](LICENSE). Fork and use it freely; if you distribute your own version, its
+[GPL-3.0-or-later](LICENSE). Fork and use it freely. If you distribute your own version, its
 source has to stay open under the same licence.

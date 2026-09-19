@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Erudit: сложные слова страницы с переводом</title>
+    <title>Erudit: новые слова из оригинала повторяются в текстах на родном</title>
     <meta
       name="description"
-      content="Браузерное расширение для чтения в оригинале. Собирает текст любой страницы, отдаёт вашей модели и показывает слова выше вашего уровня с переводом, подсветкой и словарём."
+      content="Браузерное расширение для чтения в оригинале. Подсвечивает слова выше вашего уровня с переводом, складывает их в словарь и потом подставляет эти же слова в статьи на родном языке, пока они не запомнятся."
     />
     <link rel="icon" href="logo.png" />
     <link rel="canonical" href="https://hakoba.github.io/erudit/" />
@@ -623,6 +623,25 @@
       .pop-note {
         color: var(--ink-2);
         font-size: 0.85rem;
+      }
+
+      .pop-actions {
+        display: flex;
+        gap: 0.4rem;
+        margin-top: 0.15rem;
+      }
+
+      .pop-actions span {
+        font-size: 0.8rem;
+        padding: 0.15rem 0.6rem;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        color: var(--ink-2);
+      }
+
+      .pop-actions .ok {
+        border-color: var(--sage);
+        color: var(--sage);
       }
 
       .source {
@@ -1293,6 +1312,7 @@
         </a>
         <nav class="nav-links">
           <a href="#words">Слова</a>
+          <a href="#repeat">Повторение</a>
           <a href="#features">Возможности</a>
           <a href="#model">Модель</a>
           <a href="https://github.com/Hakoba/erudit">GitHub</a>
@@ -1306,10 +1326,12 @@
       <section class="hero">
         <div class="wrap hero-grid">
           <div>
-            <h1>Сложные слова уже <span class="hl">разобраны</span></h1>
+            <h1>Новые слова <span class="hl">возвращаются</span> в тексты на родном</h1>
             <p class="lead">
-              На любой странице: расширение собирает текст, отдаёт вашей модели и показывает слова
-              выше вашего уровня с переводом и подсветкой.
+              Читаете статью по-английски, расширение подсвечивает слова выше вашего уровня с переводом.
+              Сохраняете нужные. Потом открываете новости на родном, и эти же слова стоят там вместо
+              своих переводов. Каждая такая встреча двигает слово по интервалам повторения, как в Anki,
+              только без карточек.
             </p>
             <div class="hero-cta">
               <a class="btn btn-primary" href="#install">Установить</a>
@@ -1444,6 +1466,43 @@
             <span><i class="swatch"></i> новое слово на странице</span>
             <span><i class="swatch swatch-saved"></i> уже в вашем словаре</span>
             <span>Пара языков настраивается: 13 языков текста, интерфейс на шести</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="repeat">
+        <div class="wrap reveal">
+          <h2>Те же слова встречают вас в текстах на родном</h2>
+          <p class="lead" style="margin-top: 1rem">
+            Режим «Подмена слов»: на странице на вашем языке слова из словаря встают на место
+            своих переводов. Наведите на слово, вспомните его, и оно уйдёт по лестнице
+            повторений дальше. Читаете новости, а повторение идёт само.
+          </p>
+
+          <p class="demo-text" lang="ru">
+            Это
+            <button type="button" class="w w-saved">
+              universally<span class="pop" role="tooltip">
+                <span class="pop-head">universally <span class="lvl">B2</span></span>
+                <span class="pop-note">В тексте стояло: «повсеместно»</span>
+                <span class="pop-actions"><span>Не знал</span><span class="ok">Знал</span></span>
+              </span>
+            </button>
+            признанная истина: молодой человек, располагающий хорошей
+            <button type="button" class="w w-saved">
+              fortune<span class="pop" role="tooltip">
+                <span class="pop-head">fortune <span class="lvl">B2</span></span>
+                <span class="pop-note">В тексте стояло: «суммой»</span>
+                <span class="pop-actions"><span>Не знал</span><span class="ok">Знал</span></span>
+              </span> </button
+            >, должен подыскивать себе жену.
+          </p>
+
+          <p class="source">Та же фраза Остин в переводе: слова из вашего словаря заняли места своих переводов</p>
+
+          <div class="legend">
+            <span><i class="swatch swatch-saved"></i> слово из словаря вместо перевода</span>
+            <span>Работает офлайн, только по вашему словарю, без модели и запросов</span>
           </div>
         </div>
       </section>
@@ -1778,8 +1837,9 @@
             <div class="rival">
               <dt><a href="https://jointoucan.com/">Toucan</a></dt>
               <dd>
-                Обратный подход: вкрапляет слова изучаемого языка в страницы на родном.
-                После покупки Babbel полностью бесплатен.
+                Вкрапляет слова изучаемого языка в страницы на родном, но без своего словаря
+                и без интервалов. У Erudit это режим «Подмена слов» поверх слов, которые вы
+                сами сохранили при чтении. После покупки Babbel Toucan полностью бесплатен.
               </dd>
             </div>
             <div class="rival">
