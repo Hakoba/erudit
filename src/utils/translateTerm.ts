@@ -50,6 +50,19 @@ export async function dictTranslate(term: string): Promise<WordWithExplanation |
 }
 
 /**
+ * Обратный перевод для режима вкраплений: на родной странице выделено родное
+ * слово, а в словарь оно должно лечь как запись изучаемого языка — поэтому
+ * `original` берётся из перевода, а выделенное становится `translate`.
+ * Источник только машинный: Яндекс.Словарь и модель работают в прямой паре.
+ */
+export async function reverseTranslate(term: string): Promise<WordWithExplanation | undefined> {
+  const { sourceLang } = await getReaderSettings()
+  const original = await machineTranslate(term, true)
+
+  return original ? withLevel({ original, translate: term }, sourceLang) : undefined
+}
+
+/**
  * Переводы к пачке слов разбора. Машинный переводчик получает их одним запросом
  * (или по слову, если пакет не умеет), Яндекс.Словарь — только по слову. Позиции
  * совпадают с `terms`; `undefined` — перевода нет. Отказ источника целиком —

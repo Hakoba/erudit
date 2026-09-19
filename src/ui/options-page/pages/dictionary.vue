@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { BookA, Check, ChevronDown, Download, Languages, Pencil, Plus, RotateCcw, Trash2, Upload, X } from 'lucide-vue-next'
+import { BookA, Check, ChevronDown, Download, Languages, Pencil, Plus, RotateCcw, Sparkles, Trash2, Upload, X } from 'lucide-vue-next'
 import AppLoader from '@/components/AppLoader.vue'
 import InlineSvg from '@/components/InlineSvg.vue'
 import dictionaryArt from '@/assets/illustrations/dictionary.svg?raw'
@@ -11,14 +11,18 @@ import noResultsArt from '@/assets/illustrations/no-results.svg?raw'
 import sqlWasmUrl from 'sql.js/dist/sql-wasm.wasm?url'
 import { parseApkg } from '@/utils/anki'
 import LookupPanel from '@/components/LookupPanel.vue'
-import { dictTranslate, dictTranslateMany } from '@/utils/translateTerm'
+import { dictTranslate } from '@/utils/translateTerm'
 import { useAnkiExport } from '@/composables/useAnkiExport'
+import { useDemoDictionary } from '@/composables/useDemoDictionary'
 import { useDictionary } from '@/composables/useDictionary'
+import { useFillTranslations } from '@/composables/useFillTranslations'
 import { useIgnoredWords } from '@/composables/useIgnoredWords'
+import { useReaderSettings } from '@/composables/useReaderSettings'
+import { DEMO_LEVELS } from '@/utils/demoDictionary'
+import { PROFILE_LANG } from '@/utils/analyze'
 import { CEFR_LEVELS, type CefrLevel, type DictionaryEntry } from '@/types/words'
 import {
   EMPTY_FILTERS,
-  chunk,
   levelFilterOptions,
   queryEntries,
   untranslatedEntries,
@@ -28,9 +32,6 @@ import {
 } from '@/utils/dictionary'
 
 const PAGE_SIZE = 20
-
-/** Пачка запросов за раз: залпом на весь словарь бесключевые переводчики отвечают капчей */
-const FILL_BATCH = 5
 
 // composables
 const { t } = useI18n()
@@ -44,6 +45,9 @@ const {
   purgeDeleted,
 } = useDictionary()
 const { ignored, restoreWord } = useIgnoredWords()
+const { fillState, fillTranslations } = useFillTranslations()
+const { demoState, loadDemo } = useDemoDictionary()
+const { settings } = useReaderSettings()
 
 /**
  * Скрытые слова — под нативным `details`: список растёт годами, и на экране словаря
@@ -72,13 +76,6 @@ const editedTranslate = ref<string>('')
 const lookupId = ref<string>('')
 const isFormOpen = ref<boolean>(false)
 const isSuggesting = ref<boolean>(false)
-const fillState = ref<{ busy: boolean; done: number; total: number; message: string; failed: boolean }>({
-  busy: false,
-  done: 0,
-  total: 0,
-  message: '',
-  failed: false,
-})
 const importState = ref<{ busy: boolean; message: string; failed: boolean }>({
   busy: false,
   message: '',
@@ -109,6 +106,8 @@ const isFilterActive = computed<boolean>(() =>
 const isDraftValid = computed<boolean>(() =>
   Boolean(draft.value.original.trim() && draft.value.translate.trim()),
 )
+/** Наборы собраны только по английскому: на другом языке чтения кнопок нет */
+const isDemoOffered = computed<boolean>(() => settings.value.sourceLang === PROFILE_LANG)
 
 // методы
 function resetFilters(): void {
@@ -143,45 +142,6 @@ async function suggestTranslation(force = false): Promise<void> {
     if (translate) draft.value.translate = translate
   } finally {
     isSuggesting.value = false
-  }
-}
-
-/**
- * Дозаполнить пустые переводы выбранным источником. Пачками, а не залпом; отказ
- * на одном слове остальных не отменяет, а общий отказ — например, кончившаяся
- * квота — приходит сообщением в `error`.
- */
-async function fillTranslations(): Promise<void> {
-  const list = missing.value
-  if (!list.length || fillState.value.busy) return
-
-  fillState.value = { busy: true, done: 0, total: list.length, message: '', failed: false }
-  let filled = 0
-  let error = ''
-
-  for (const batch of chunk(list, FILL_BATCH)) {
-    const outcome = await dictTranslateMany(batch.map((item) => item.original))
-
-    batch.forEach((item, index) => {
-      const translate = outcome.values[index]
-      if (!translate) return
-
-      updateEntry(item.id, { translate })
-      filled += 1
-    })
-    fillState.value.done += batch.length
-    if (outcome.error) {
-      error = outcome.error
-      break
-    }
-  }
-
-  fillState.value = {
-    busy: false,
-    done: 0,
-    total: 0,
-    failed: Boolean(error),
-    message: error || t('dictionary.fillDone', { filled, left: missing.value.length }),
   }
 }
 
@@ -262,7 +222,7 @@ function submitDraft(): void {
             :label="fillState.busy
               ? t('dictionary.fillBusy', { done: fillState.done, total: fillState.total })
               : t('dictionary.fill', { count: missing.length })"
-            @click="fillTranslations"
+            @click="fillTranslations(missing)"
           >
             <template #icon>
               <AppLoader
@@ -372,6 +332,14 @@ function submitDraft(): void {
           :closable="false"
         >
           {{ fillState.message }}
+        </Message>
+
+        <Message
+          v-if="demoState.message"
+          :severity="demoState.failed ? 'error' : 'success'"
+          :closable="false"
+        >
+          {{ demoState.message }}
         </Message>
 
         <Message
@@ -536,6 +504,47 @@ function submitDraft(): void {
           <p class="m-0 max-w-sm text-muted">
             {{ t('dictionary.emptyHint') }}
           </p>
+
+          <div
+            v-if="isDemoOffered"
+            class="flex flex-col items-center gap-2 border-t border-line pt-4"
+          >
+            <ul class="m-0 flex list-none flex-wrap justify-center gap-2 p-0">
+              <li
+                v-for="level in DEMO_LEVELS"
+                :key="level"
+              >
+                <Button
+                  size="small"
+                  severity="secondary"
+                  outlined
+                  :disabled="demoState.busy"
+                  :label="t('dictionary.demo', { level })"
+                  @click="loadDemo(level)"
+                >
+                  <template #icon>
+                    <Sparkles :size="16" />
+                  </template>
+                </Button>
+              </li>
+            </ul>
+            <small
+              v-if="demoState.busy"
+              class="flex items-center gap-2 text-muted"
+            >
+              <AppLoader
+                variant="swap"
+                :size="16"
+              />
+              {{ t('dictionary.demoBusy') }}
+            </small>
+            <small
+              v-else
+              class="max-w-sm text-muted"
+            >
+              {{ t('dictionary.demoHint') }}
+            </small>
+          </div>
         </div>
 
         <!-- словарь не пуст, но фильтры ничего не оставили: это про фильтры, не про словарь -->

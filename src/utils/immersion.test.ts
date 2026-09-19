@@ -109,6 +109,14 @@ test('isTargetLanguageText: общая письменность пары вык�
   assert.equal(isTargetLanguageText('Página en español con muchas palabras.', 'es', 'en'), false)
 })
 
+test('isTargetLanguageText: при общей письменности решает <html lang>', () => {
+  const text = 'Página en español con muchas palabras.'
+  assert.ok(isTargetLanguageText(text, 'es', 'en', 'es-MX'))
+  assert.equal(isTargetLanguageText(text, 'es', 'en', 'en'), false)
+  // разные письменности: текст надёжнее шаблонного lang сайта
+  assert.ok(isTargetLanguageText('Это русский текст про словарь и чтение.', 'ru', 'en', 'en'))
+})
+
 test('isTargetLanguageText: пустой текст и неизвестный язык', () => {
   assert.equal(isTargetLanguageText('', 'ru', 'en'), false)
   assert.equal(isTargetLanguageText('текст', 'xx', 'en'), false)

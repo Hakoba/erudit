@@ -91,11 +91,15 @@ async function send(
  * вызывающий в этом случае идёт к модели. Отказ по ключу пробрасывается ошибкой:
  * молча откатываться на платную модель при опечатке в ключе — плохая услуга.
  */
-export async function machineTranslate(term: string): Promise<string> {
+export async function machineTranslate(term: string, reverse = false): Promise<string> {
   const ready = await readyTranslator()
   if (!ready) return ''
 
-  const { adapter, credentials, sourceLang, targetLang } = ready
+  const { adapter, credentials } = ready
+  // `reverse` — режим вкраплений: выделено слово родного языка, переводим его в изучаемый
+  const [sourceLang, targetLang] = reverse
+    ? [ready.targetLang, ready.sourceLang]
+    : [ready.sourceLang, ready.targetLang]
   const key = cacheKey(adapter.id, sourceLang, targetLang, term)
   const cached = cache.get(key)
   if (cached) return cached

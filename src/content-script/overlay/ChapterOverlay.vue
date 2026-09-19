@@ -23,7 +23,7 @@ import { isPanelOpen, publishPanelState, releasePanelCommandHandler, requestPane
 import type { PanelCommand } from '@/utils/panelBus'
 import { clearHighlights, hasOccurrence, highlightTerms, replaceTerms, restoreReplacement, revealTerm } from '@/utils/highlight'
 import { type ImmersionMatch, isTargetLanguageText, pickImmersionWords } from '@/utils/immersion'
-import { translateTerm } from '@/utils/translateTerm'
+import { reverseTranslate, translateTerm } from '@/utils/translateTerm'
 import { normalizeTerm } from '@/utils/dictionary'
 import { extractReadableText } from '@/utils/pageText'
 import { findSentence } from '@/utils/sentence'
@@ -42,7 +42,7 @@ const {
   fetchDifficultWords,
   cancelFetch,
 } = useDifficultWords()
-const { entries, addEntry, hasEntry, updateEntry } = useDictionary()
+const { entries, addEntry, hasEntry, updateEntry, removeEntry } = useDictionary()
 const { hasSelector, setSelector, clearSelector } = useAreaSelectors()
 const { isCollapsed, width: dockWidth } = useOverlayDock()
 const { anchor, clearSelection } = useTextSelection()
@@ -80,6 +80,19 @@ const hasArea = computed<boolean>(() => hasSelector(location.href))
 const savedTerms = computed<string[]>(() => entries.value.map((entry) => entry.original))
 
 const selectionMode = computed<SelectionMode>(() => readerSettings.value.selectionMode)
+
+/**
+ * В режиме вкраплений выделено слово родного языка, и перевод — это `original`
+ * записи: изучаемое слово, под которым она ляжет в словарь.
+ */
+const selectionTranslate = computed<string | undefined>(() =>
+  isImmersionActive.value ? selectionWord.value?.original : selectionWord.value?.translate,
+)
+
+/** Слово, под которым выделенное попадёт в словарь: до перевода вкраплений его ещё нет */
+const selectionTerm = computed<string>(() =>
+  (isImmersionActive.value ? selectionWord.value?.original : anchor.value?.text) ?? '',
+)
 
 const saveSelectionLabel = computed<string>(() => {
   if (selectionStage.value === 'loading') return t('overlay.saveSelectionBusy')
@@ -266,7 +279,7 @@ async function analyze(full = false): Promise<void> {
     const { sourceLang, targetLang } = readerSettings.value
     const pageText = await extractReadableText()
 
-    if (isTargetLanguageText(pageText, targetLang, sourceLang)) {
+    if (isTargetLanguageText(pageText, targetLang, sourceLang, document.documentElement.lang)) {
       startImmersion(pageText)
       return
     }
@@ -340,6 +353,17 @@ function addToDictionary(word: WordWithExplanation): void {
   })
 }
 
+/**
+ * Слово из словаря оказалось лишним: удаляем (мягко, как на экране словаря) и
+ * прячем — иначе следующий разбор предложит его снова как новое.
+ */
+function hideSavedWord(term: string): void {
+  const key = normalizeTerm(term)
+  const saved = entries.value.find((entry) => normalizeTerm(entry.original) === key)
+  if (saved) removeEntry(saved.id)
+  ignoreWord(term)
+}
+
 /** Пояснения тут не будет: их подтягивает WordItem, а списком слов их никто не раскрывал */
 function addAll(): void {
   newWords.value.forEach(addToDictionary)
@@ -379,7 +403,9 @@ async function translateSelection(): Promise<void> {
   selectionStage.value = 'loading'
 
   try {
-    const word = await translateTerm(selected.text, selectionContext(selected) ?? '')
+    const word = isImmersionActive.value
+      ? await reverseTranslate(selected.text)
+      : await translateTerm(selected.text, selectionContext(selected) ?? '')
     // пока ходили за переводом, выделение могли сменить — тот ответ уже не к месту
     if (anchor.value?.text !== selected.text) return
     if (!word) throw new Error(t('errors.translationMissing'))
@@ -396,10 +422,14 @@ function saveSelectionWord(): void {
   const word = selectionWord.value
   if (!selected || !word) return
 
+  // вкрапления переводят в обратную сторону: изучаемое слово в записи — `original`,
+  // выделенное становится переводом. Контекст оттуда родной, записи он ни к чему
+  const isReverse = isImmersionActive.value
+
   addEntry({
-    original: selected.text,
-    translate: word.translate,
-    context: selectionContext(selected),
+    original: isReverse ? word.original : selected.text,
+    translate: isReverse ? selected.text : word.translate,
+    context: isReverse ? undefined : selectionContext(selected),
     level: word.level,
   })
 }
@@ -458,11 +488,28 @@ async function translateAndSave(): Promise<void> {
       :level="hoverWord.level"
       :note="savedNote(hoverWord.original) ?? t('overlay.foundHere')"
     >
-      <!-- у сохранённого слова кнопок нет: про него всё сказано в `note`.
-           «Скрыть» — иконкой с подсказкой, как в строке панели: карточка узкая,
-           и подпись рядом с «Добавить в словарь» переносится по слогам -->
+      <!-- у сохранённого слова одна кнопка — убрать из словаря в скрытые: его статус
+           уже сказан в `note`. У нового «Скрыть» — иконкой с подсказкой, как в строке
+           панели: карточка узкая, и подпись рядом с «Добавить в словарь» переносится -->
       <div
-        v-if="!hasEntry(hoverWord.original)"
+        v-if="hasEntry(hoverWord.original)"
+        class="flex justify-end"
+      >
+        <Button
+          size="small"
+          severity="secondary"
+          text
+          :label="t('overlay.hideSaved')"
+          v-bind="hintAttrs(t('overlay.hideSavedHint'))"
+          @click="hideSavedWord(hoverWord.original)"
+        >
+          <template #icon>
+            <EyeOff :size="16" />
+          </template>
+        </Button>
+      </div>
+      <div
+        v-else
         class="flex items-center justify-end gap-1"
       >
         <Button
@@ -543,9 +590,9 @@ async function translateAndSave(): Promise<void> {
     <WordCard
       v-else
       :term="anchor.text"
-      :translate="selectionStage === 'failed' ? t('overlay.translateFailed') : selectionWord?.translate"
+      :translate="selectionStage === 'failed' ? t('overlay.translateFailed') : selectionTranslate"
       :level="selectionWord?.level"
-      :note="savedNote(anchor.text)"
+      :note="savedNote(selectionTerm)"
       :is-loading="selectionStage === 'loading'"
     >
       <div class="flex justify-end">
@@ -567,13 +614,13 @@ async function translateAndSave(): Promise<void> {
           size="small"
           severity="success"
           outlined
-          :disabled="selectionStage !== 'ready' || hasEntry(anchor.text)"
-          :label="t(hasEntry(anchor.text) ? 'overlay.alreadySaved' : 'overlay.addToDictionary')"
+          :disabled="selectionStage !== 'ready' || hasEntry(selectionTerm)"
+          :label="t(hasEntry(selectionTerm) ? 'overlay.alreadySaved' : 'overlay.addToDictionary')"
           @click="saveSelectionWord"
         >
           <template #icon>
             <BookmarkCheck
-              v-if="hasEntry(anchor.text)"
+              v-if="hasEntry(selectionTerm)"
               :size="16"
               fill="currentColor"
             />

@@ -160,18 +160,27 @@ const SHARE_THRESHOLD = 0.6
 /** Хвост длинной страницы долю уже не изменит */
 const SAMPLE_LETTERS = 3000
 
+/** Первичный субтег из `<html lang>`: `ru-RU` → `ru`, пусто — атрибута нет */
+function primaryLang(pageLang: string): string {
+  return pageLang.trim().toLowerCase().split('-')[0] ?? ''
+}
+
 /**
- * Страница на языке перевода? Доля букв его письменности среди всех букв.
- * Пары с общей письменностью не различить — режим для них молчит:
- * ложное молчание дешевле ложной замены.
+ * Страница на языке перевода? Доля букв его письменности среди всех букв —
+ * по самому тексту, это надёжнее шаблонного `lang` сайта. Пары с общей
+ * письменностью так не различить, и для них решает `<html lang>`: объявил
+ * язык перевода — режим работает, иначе молчит (ложное молчание дешевле
+ * ложной замены).
  */
 export function isTargetLanguageText(
   text: string,
   targetLang: string,
   sourceLang: string,
+  pageLang = '',
 ): boolean {
   const target = SCRIPT_BY_LANGUAGE[targetLang]
-  if (!target || target === SCRIPT_BY_LANGUAGE[sourceLang]) return false
+  if (!target) return false
+  if (target === SCRIPT_BY_LANGUAGE[sourceLang]) return primaryLang(pageLang) === targetLang
 
   const letters = SCRIPT_LETTERS[target]
   if (!letters) return false

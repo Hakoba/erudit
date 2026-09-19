@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { BookOpen, Bot, CircleQuestionMark, ExternalLink, GraduationCap, Languages } from 'lucide-vue-next'
+import { BookOpen, Bot, CircleQuestionMark, ExternalLink, GraduationCap, Languages, Sparkles } from 'lucide-vue-next'
 import AccessSites from '@/components/accessSites.vue'
+import AppLoader from '@/components/AppLoader.vue'
 import InlineSvg from '@/components/InlineSvg.vue'
 import welcomeArt from '@/assets/illustrations/welcome.svg?raw'
 import { DEMO_URL, useAccessSites } from '@/composables/useAccessSites'
+import { useDemoDictionary } from '@/composables/useDemoDictionary'
 import { useReaderSettings } from '@/composables/useReaderSettings'
 import { PROFILE_LANG } from '@/utils/analyze'
+import { clampDemoLevel, type DemoLevel } from '@/utils/demoDictionary'
 import { LANGUAGES } from '@/utils/languages'
 import { FAQ_URL } from '@/utils/dictionaryTab'
 import { CEFR_LEVELS } from '@/types/words'
@@ -15,6 +18,7 @@ import { CEFR_LEVELS } from '@/types/words'
 const { t } = useI18n()
 const { settings } = useReaderSettings()
 const { isUrlAllowed } = useAccessSites()
+const { demoState, loadDemo } = useDemoDictionary()
 
 const displayName = __DISPLAY_NAME__
 const faqUrl = browser.runtime.getURL(FAQ_URL)
@@ -28,6 +32,8 @@ const demoUrl = computed<string | undefined>(() =>
 
 // разбор без модели держится на профиле CEFR, а он собран только по английскому
 const needsModel = computed<boolean>(() => settings.value.sourceLang !== PROFILE_LANG)
+/** Набора для A1 и C2 нет: на них подсветке нечего показать на обычной странице */
+const demoLevel = computed<DemoLevel>(() => clampDemoLevel(settings.value.level))
 
 // методы
 function openOptions(): void {
@@ -151,6 +157,30 @@ function openOptions(): void {
               </Button>
             </a>
 
+            <!-- словарь пуст после установки: без слов ни подсветки сохранённого,
+                 ни тренировки, ни экспорта в Anki не увидеть -->
+            <Button
+              v-if="!needsModel"
+              severity="secondary"
+              outlined
+              :label="demoState.busy ? t('dictionary.demoBusy') : t('dictionary.demo', { level: demoLevel })"
+              :title="t('dictionary.demoHint')"
+              :disabled="demoState.busy"
+              @click="loadDemo(demoLevel)"
+            >
+              <template #icon>
+                <AppLoader
+                  v-if="demoState.busy"
+                  variant="swap"
+                  :size="16"
+                />
+                <Sparkles
+                  v-else
+                  :size="16"
+                />
+              </template>
+            </Button>
+
             <Button
               :label="t(needsModel ? 'setup.connectModel' : 'common.openSettings')"
               :severity="needsModel ? 'primary' : 'secondary'"
@@ -183,6 +213,14 @@ function openOptions(): void {
               </Button>
             </a>
           </div>
+
+          <Message
+            v-if="demoState.message"
+            :severity="demoState.failed ? 'error' : 'success'"
+            :closable="false"
+          >
+            {{ demoState.message }}
+          </Message>
         </li>
       </ol>
     </template>
