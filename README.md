@@ -27,7 +27,7 @@ Works right after installing, with no keys and no subscription. Any page with te
 an article, a docs page, a Reddit thread, a chapter of a book. It only runs on the sites you
 allow yourself.
 
-> **Version 0.0.9.** Not in the extension stores yet, so it is installed from source.
+> **Version 0.0.10.** Not in the extension stores yet, so it is installed from source.
 > Everything described below works. What is still missing is listed under [Roadmap](#roadmap).
 
 <p align="center">
