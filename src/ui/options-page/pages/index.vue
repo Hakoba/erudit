@@ -200,6 +200,22 @@ const isProfileUseless = computed<boolean>(
           </small>
         </div>
 
+        <!-- только при модели: без неё фразы и так переводит переводчик -->
+        <template v-if="settings.engine === 'llm' && settings.selectionMode !== 'off'">
+          <div class="flex items-center gap-2 border-t border-line pt-4">
+            <ToggleSwitch
+              v-model="settings.llmPhrases"
+              input-id="llm-phrases"
+            />
+            <label for="llm-phrases">
+              {{ t('settings.analyze.llmPhrases') }}
+            </label>
+          </div>
+          <small class="-mt-2 text-muted">
+            {{ t('settings.analyze.llmPhrasesHint') }}
+          </small>
+        </template>
+
         <div class="flex flex-col gap-2 border-t border-line pt-4">
           <label
             for="prompt-extra"

@@ -97,6 +97,12 @@ export async function translateTerm(
   term: string,
   context: string,
 ): Promise<WordWithExplanation | undefined> {
+  const { engine, llmPhrases } = await getReaderSettings()
+
+  // фраза при включённой модели идёт к ней сразу: переводчик не видит контекста,
+  // переводит идиому пословно и не ставит уровень. Слово — всегда сначала словарь
+  if (engine === 'llm' && llmPhrases && !isSingleWord(term)) return requestTranslation(term, context)
+
   // пусто — словарь не знает слова, а переводчик не выбран или не справился
   return (await dictTranslate(term)) ?? requestTranslation(term, context)
 }

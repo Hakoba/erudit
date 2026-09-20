@@ -42,6 +42,8 @@ export interface ReaderSettings {
   immersion: boolean
   /** Реакция на выделение текста на странице */
   selectionMode: SelectionMode
+  /** Выделенную фразу переводит модель (видит контекст, ставит уровень); слово всегда у словаря */
+  llmPhrases: boolean
 }
 
 // родной язык угадываем по браузеру: тому, у кого интерфейс на русском, вряд ли
@@ -60,6 +62,7 @@ export const DEFAULT_READER_SETTINGS: ReaderSettings = {
   uiLang: defaultUiLanguage(),
   immersion: false,
   selectionMode: 'translate',
+  llmPhrases: true,
 }
 
 const { data, promise } = useBrowserSyncStorage<ReaderSettings>(

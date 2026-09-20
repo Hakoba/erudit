@@ -78,6 +78,8 @@ export default {
       engineOnlyEnglish: 'El perfil sin conexión solo cubre el inglés. Para este idioma cambia al modelo.',
       autoAnalyze: 'Analizar la página en cuanto se abra',
       autoAnalyzeHint: 'Si está desactivado, el panel espera al botón “Analizar la página”. El resaltado de las palabras guardadas y las traducciones al pasar el ratón funcionan sin el modelo.',
+      llmPhrases: 'Las frases seleccionadas las traduce el modelo',
+      llmPhrasesHint: 'El modelo ve el contexto, traduce las expresiones enteras y asigna un nivel CEFR. Si está desactivado, las frases van al traductor de los ajustes de diccionarios, como las palabras, y al modelo solo si falla.',
       promptExtra: 'Añadido al prompt',
       promptExtraPlaceholder: 'Por ejemplo: omite nombres propios, traduce en tono coloquial, explica los términos técnicos con más detalle',
       promptExtraHint: 'Va al mensaje de sistema junto con nuestras reglas. El formato de la respuesta es nuestro: un añadido no puede romper el análisis. Caracteres restantes: {left}.',

@@ -78,6 +78,8 @@ export default {
       engineOnlyEnglish: 'The offline profile only covers English. For this language, switch to a model.',
       autoAnalyze: 'Analyse the page as soon as it opens',
       autoAnalyzeHint: 'When off, the overlay waits for the “Analyse page” button. Highlighting of saved words and hover translations work without the model.',
+      llmPhrases: 'Selected phrases are translated by the model',
+      llmPhrasesHint: 'The model sees the context, translates idioms as a whole and assigns a CEFR level. When off, phrases go to the translator from the dictionary settings like single words, and to the model only if it fails.',
       promptExtra: 'Prompt addition',
       promptExtraPlaceholder: 'For example: skip names and titles, keep the translation colloquial, explain technical terms in more detail',
       promptExtraHint: 'Goes into the system message together with our rules. The response format is ours, so an addition cannot break the analysis. Characters left: {left}.',

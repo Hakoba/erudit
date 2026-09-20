@@ -78,6 +78,8 @@ export default {
       engineOnlyEnglish: '离线词表只覆盖英语。这个语言请改用模型。',
       autoAnalyze: '打开页面后立即分析',
       autoAnalyzeHint: '关闭后，浮层会等你点击“分析页面”。已保存词语的高亮和悬停翻译不依赖模型。',
+      llmPhrases: '选中的短语由模型翻译',
+      llmPhrasesHint: '模型能看到上下文，整体翻译习语并给出 CEFR 等级。关闭后，短语和单词一样交给词典设置中的翻译器，只有翻译失败时才交给模型。',
       promptExtra: '提示词补充',
       promptExtraPlaceholder: '例如：人名和专名不必解析，翻译偏口语，术语解释得更详细',
       promptExtraHint: '它会和我们的规则一起进入系统消息。响应格式由我们决定——补充内容不会破坏分析。剩余字符：{left}。',
