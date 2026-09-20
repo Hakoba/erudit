@@ -452,10 +452,12 @@ async function translateAndSave(): Promise<void> {
 </script>
 
 <template>
-  <!-- зазор до слова закрыт паддингом обёртки: курсор доезжает до кнопок, не теряя карточку -->
+  <!-- зазор до слова закрыт паддингом обёртки: курсор доезжает до кнопок, не теряя карточку.
+       `w-max` обязателен: fixed-блок у правого края ужимается до расстояния от `left`
+       до края окна ещё до сдвига на -50 %, и карточка складывалась в столбик -->
   <div
     v-if="hint && hoverImmersion"
-    class="fixed -translate-x-1/2 -translate-y-full pb-1.5"
+    class="fixed w-max -translate-x-1/2 -translate-y-full pb-1.5"
     :style="{ left: clampX(hint.x), top: `${hint.y}px` }"
   >
     <WordCard
@@ -486,7 +488,7 @@ async function translateAndSave(): Promise<void> {
   <!-- зазор до слова закрыт паддингом обёртки: курсор доезжает до кнопки, не теряя карточку -->
   <div
     v-else-if="hint && hoverWord"
-    class="fixed -translate-x-1/2 -translate-y-full pb-1.5"
+    class="fixed w-max -translate-x-1/2 -translate-y-full pb-1.5"
     :style="{ left: clampX(hint.x), top: `${hint.y}px` }"
   >
     <WordCard
@@ -549,7 +551,7 @@ async function translateAndSave(): Promise<void> {
 
   <div
     v-if="anchor && selectionMode !== 'off'"
-    class="fixed -translate-x-1/2 -translate-y-[calc(100%+8px)]"
+    class="fixed w-max -translate-x-1/2 -translate-y-[calc(100%+8px)]"
     :style="{ left: clampX(anchor.x), top: `${anchor.y}px` }"
   >
     <!-- предохранитель: перевод стоит запроса, поэтому сначала спрашиваем, нужен ли он -->
