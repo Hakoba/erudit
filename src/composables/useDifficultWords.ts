@@ -18,7 +18,7 @@ export function useDifficultWords(): {
   sourceText: Ref<string>
   isLoading: Ref<boolean>
   errorMessage: Ref<string>
-  fetchDifficultWords: (full?: boolean) => Promise<void>
+  fetchDifficultWords: (full?: boolean, knownText?: string) => Promise<void>
   cancelFetch: () => void
 } {
   // state
@@ -32,10 +32,14 @@ export function useDifficultWords(): {
   let currentRequest = 0
 
   // методы
-  /** `full` — читать страницу с нуля, а не только дописанное: разбор просят повторить руками */
-  async function fetchDifficultWords(full = false): Promise<void> {
+  /**
+   * `full` — читать страницу с нуля, а не только дописанное: разбор просят повторить
+   * руками. `knownText` — текст, который вызывающий уже собрал (проверка языка идёт
+   * до разбора): второй обход DOM на тяжёлой странице стоит столько же, сколько первый
+   */
+  async function fetchDifficultWords(full = false, knownText?: string): Promise<void> {
     const request = ++currentRequest
-    const pageText = await extractReadableText()
+    const pageText = knownText ?? await extractReadableText()
     if (request !== currentRequest) return
 
     // на странице с догрузкой разбирается только дописанное, иначе разбор упрётся

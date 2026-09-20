@@ -29,15 +29,16 @@ function queryAll(selector: string): Element[] {
   }
 }
 
+// не `getComputedStyle`: на странице в 20k элементов он занимал половину сбора текста
 function isHidden(element: Element): boolean {
-  if (element.getAttribute('aria-hidden') === 'true') return true
-  const styles = getComputedStyle(element)
-
-  return styles.display === 'none' || styles.visibility === 'hidden'
+  return element.getAttribute('aria-hidden') === 'true' || !element.checkVisibility(VISIBILITY)
 }
 
 /** Не текст страницы: у SPA в body лежат JSON гидрации и стили компонентов */
 const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE', 'SVG'])
+
+/** `visibility: hidden` без опции `checkVisibility` не видит */
+const VISIBILITY: CheckVisibilityOptions = { visibilityProperty: true }
 
 /**
  * `textContent` напрямую брать нельзя: он отдаёт и содержимое script/style —
@@ -50,7 +51,7 @@ function visibleText(root: Element): string {
         // свёрнутый аккордеон, закрытый details, «показать ещё»: текст есть в DOM,
         // а читателю не виден — в разбор он уходил бы за деньги и не подсвечивался.
         // `checkVisibility` видит и display:none у предка, и content-visibility
-        if (SKIP_TAGS.has(node.tagName.toUpperCase()) || !node.checkVisibility()) return NodeFilter.FILTER_REJECT
+        if (SKIP_TAGS.has(node.tagName.toUpperCase()) || !node.checkVisibility(VISIBILITY)) return NodeFilter.FILTER_REJECT
 
         return NodeFilter.FILTER_SKIP
       }

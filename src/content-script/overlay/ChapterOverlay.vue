@@ -322,7 +322,7 @@ async function analyze(full = false): Promise<void> {
     isImmersionActive.value = false
   }
 
-  return fetchDifficultWords(full)
+  return fetchDifficultWords(full, pageText)
 }
 
 /** Затянувшийся разбор отменили: возвращаемся к состоянию «разобрать руками» */
