@@ -19,6 +19,19 @@ export function openDictionaryTab(): void {
  * Настройки — тоже через background: `openOptionsPage` есть на страницах расширения,
  * но не в content script, а шапка одна на оверлей и на боковую панель.
  */
-export function openOptionsTab(): void {
-  void browser.runtime.sendMessage({ type: 'ui/open-options' })
+export function openOptionsTab(section?: OptionsSection): void {
+  void browser.runtime.sendMessage({ type: 'ui/open-options', section })
+}
+
+/** Разделы настроек, которые можно открыть напрямую; background сверяет со списком */
+export const OPTIONS_SECTIONS = ['sites', 'dictionary', 'faq'] as const
+
+export type OptionsSection = (typeof OPTIONS_SECTIONS)[number]
+
+export function isOptionsSection(value: unknown): value is OptionsSection {
+  return typeof value === 'string' && OPTIONS_SECTIONS.some((section) => section === value)
+}
+
+export function optionsSectionUrl(section: OptionsSection): string {
+  return `src/ui/options-page/index.html?route=/options-page/${section}`
 }

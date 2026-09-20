@@ -413,6 +413,7 @@ export default {
     pickerChars: '{count}자',
     panelUnavailable: 'Erudit이 이 페이지에서 꺼져 있습니다.',
     panelUnavailableHint: '확장 프로그램은 목록에 있는 사이트에서만 켜집니다.',
+    panelStale: '사이트는 허용되어 있지만 확장 프로그램이 접근 권한을 얻거나 업데이트되기 전에 페이지가 열렸습니다. 페이지를 새로고침하세요.',
     panelReload: '페이지 새로고침',
     panelOwnPage: '이곳은 Erudit 자체 페이지입니다.',
     panelOwnPageHint: '패널은 활성 탭의 단어를 보여 줍니다. 텍스트가 있는 탭을 열면 패널이 자동으로 전환됩니다.',

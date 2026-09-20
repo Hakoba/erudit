@@ -1,7 +1,7 @@
 import browser, { type Runtime } from "webextension-polyfill"
 import { NO_HOST_ACCESS, type BgFetchResponse } from "@/utils/bgFetch"
 import { originPattern } from "@/composables/matchesSite"
-import { DICTIONARY_URL } from "@/utils/dictionaryTab"
+import { DICTIONARY_URL, isOptionsSection, optionsSectionUrl } from "@/utils/dictionaryTab"
 import { PANEL_OPEN, PANEL_STATE } from "@/utils/panelBus"
 import { SCRIPTS_SYNC } from "@/utils/siteScripts"
 import { syncSiteScripts } from "./siteScripts"
@@ -138,7 +138,12 @@ browser.runtime.onMessage.addListener((message: unknown, sender: Runtime.Message
   if (!isObject(message)) return
   if (message.type === 'llm/fetch') return proxyFetch(message)
   if (message.type === 'ui/open-dictionary') return openDictionary()
-  if (message.type === 'ui/open-options') return browser.runtime.openOptionsPage()
+  if (message.type === 'ui/open-options') {
+    // раздел — только из своего списка: адрес со страницы сайта открывать нельзя
+    if (isOptionsSection(message.section)) return browser.tabs.create({ url: browser.runtime.getURL(optionsSectionUrl(message.section)) })
+
+    return browser.runtime.openOptionsPage()
+  }
   if (message.type === SCRIPTS_SYNC) return syncSiteScripts()
   if (message.type === PANEL_STATE) updateBadge(sender.tab?.id, message.state)
   // строго синхронно: жест пользователя не переживает await, панель без него не откроется.

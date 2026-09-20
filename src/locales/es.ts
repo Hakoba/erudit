@@ -413,6 +413,7 @@ export default {
     pickerChars: '{count} caracteres',
     panelUnavailable: 'Erudit no está activo en esta página.',
     panelUnavailableHint: 'La extensión solo se activa en los sitios de tu lista.',
+    panelStale: 'El sitio está permitido, pero la página se abrió antes de que la extensión obtuviera acceso o se actualizara. Recarga la página.',
     panelReload: 'Recargar la página',
     panelOwnPage: 'Esta es una página del propio Erudit.',
     panelOwnPageHint: 'El panel muestra las palabras de la pestaña activa. Abre una pestaña con texto — el panel cambiará a ella solo.',

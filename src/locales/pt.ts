@@ -413,6 +413,7 @@ export default {
     pickerChars: '{count} caracteres',
     panelUnavailable: 'O Erudit não está ativo nesta página.',
     panelUnavailableHint: 'A extensão só liga nos sites da sua lista.',
+    panelStale: 'O site está permitido, mas a página foi aberta antes de a extensão obter acesso ou ser atualizada. Recarregue a página.',
     panelReload: 'Recarregar a página',
     panelOwnPage: 'Esta é uma página do próprio Erudit.',
     panelOwnPageHint: 'O painel mostra as palavras do separador ativo. Abra um separador com texto — o painel muda para ele sozinho.',

@@ -7,6 +7,7 @@ import InlineSvg from '@/components/InlineSvg.vue'
 import emptyPanel from '@/assets/illustrations/empty-panel.svg?raw'
 import welcomeArt from '@/assets/illustrations/welcome.svg?raw'
 import { useAccessSites } from '@/composables/useAccessSites'
+import { isSensitiveHost } from '@/composables/matchesSite'
 import { useHostAccess } from '@/composables/useHostAccess'
 import { FAQ_URL, openOptionsTab } from '@/utils/dictionaryTab'
 
@@ -57,8 +58,12 @@ const reasonKey = computed<string>(() => {
   if (!props.currentUrl) return 'overlay.panelBrowserPage'
   if (canGrant.value) return 'sites.accessMissing'
   if (!isDenyMode.value) return 'overlay.panelUnavailableHint'
+  if (canUnblock.value) return 'popup.currentBlocked'
+  // сайт разрешён, а оверлея нет — страница открыта раньше, чем расширение обновилось
+  // или получило доступ; «бережём» говорим только когда правило и правда сработало
+  if (isUrlAllowed(props.currentUrl)) return 'overlay.panelStale'
 
-  return canUnblock.value ? 'popup.currentBlocked' : 'popup.currentGuarded'
+  return isSensitiveHost(new URL(props.currentUrl).host) ? 'popup.currentGuarded' : 'overlay.panelUnavailableHint'
 })
 const currentHost = computed<string>(() => (props.currentUrl ? new URL(props.currentUrl).host : ''))
 
@@ -167,7 +172,7 @@ async function grantCurrent(): Promise<void> {
         severity="secondary"
         text
         :label="t('nav.settings')"
-        @click="openOptionsTab"
+        @click="openOptionsTab('sites')"
       >
         <template #icon>
           <Settings :size="16" />

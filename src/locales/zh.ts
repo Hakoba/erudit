@@ -413,6 +413,7 @@ export default {
     pickerChars: '{count} 个字符',
     panelUnavailable: 'Erudit 未在此页面运行。',
     panelUnavailableHint: '扩展只在你列表中的网站上启用。',
+    panelStale: '该网站已允许，但页面是在扩展获得访问权限或更新之前打开的。请重新加载页面。',
     panelReload: '刷新页面',
     panelOwnPage: '这是 Erudit 自己的页面。',
     panelOwnPageHint: '面板显示当前标签页的单词。打开一个有文字的标签页，面板会自动切换过去。',

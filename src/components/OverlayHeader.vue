@@ -125,7 +125,7 @@ const emit = defineEmits<{
       size="small"
       :aria-label="t('nav.settings')"
       v-bind="hintAttrs(t('overlay.settingsHint'))"
-      @click="openOptionsTab"
+      @click="openOptionsTab()"
     >
       <Settings :size="16" />
     </Button>

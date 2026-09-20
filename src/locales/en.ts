@@ -413,6 +413,7 @@ export default {
     pickerChars: '{count} chars',
     panelUnavailable: 'Erudit is not active on this page.',
     panelUnavailableHint: 'The extension only turns on for sites from your list.',
+    panelStale: 'The site is allowed, but the page was opened before the extension got access to it or was updated. Reload the page.',
     panelReload: 'Reload the page',
     panelOwnPage: 'This is a page of Erudit itself.',
     panelOwnPageHint: 'The panel shows the words of the active tab. Open a tab with text — the panel will switch to it on its own.',
