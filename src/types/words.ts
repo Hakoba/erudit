@@ -36,6 +36,9 @@ export type DictionaryEntry = {
   context?: string
   explanation?: string
   level?: CefrLevel
+  /** Страница, на которой слово встретилось: адрес без query и хэша */
+  sourceUrl?: string
+  sourceTitle?: string
   addedAt: number
   updatedAt: number
   /** Мягкое удаление: запись остаётся в хранилище как надгробие */

@@ -73,6 +73,9 @@ export function useDictionary(): {
         context: input.context ?? existing.context,
         explanation: input.explanation ?? existing.explanation,
         level: input.level ?? existing.level,
+        // первая встреча важнее последней: повторное «добавить все» не переписывает словарь
+        sourceUrl: input.sourceUrl ?? existing.sourceUrl,
+        sourceTitle: input.sourceTitle ?? existing.sourceTitle,
         updatedAt: now,
         deletedAt: undefined,
       })

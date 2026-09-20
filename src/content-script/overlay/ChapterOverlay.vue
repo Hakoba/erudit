@@ -24,7 +24,7 @@ import type { PanelCommand } from '@/utils/panelBus'
 import { clearHighlights, hasOccurrence, highlightTerms, replaceTerms, restoreReplacement, revealTerm } from '@/utils/highlight'
 import { type ImmersionMatch, isTargetLanguageText, pickImmersionWords } from '@/utils/immersion'
 import { reverseTranslate, translateTerm } from '@/utils/translateTerm'
-import { normalizeTerm } from '@/utils/dictionary'
+import { normalizeTerm, pageSource } from '@/utils/dictionary'
 import { extractReadableText } from '@/utils/pageText'
 import { findSentence } from '@/utils/sentence'
 import { dueInDays, reviewEntry } from '@/utils/srs'
@@ -200,6 +200,7 @@ watchEffect(() => publishPanelState({
   words: newWords.value.map((word) => ({ ...word })),
   onPage: onPageTerms.value.slice(),
   totalWords: words.value.length,
+  page: { url: location.href, title: document.title },
 }))
 
 /** Команды из боковой панели: всё, что трогает DOM страницы, выполняет оверлей */
@@ -350,6 +351,7 @@ function addToDictionary(word: WordWithExplanation): void {
     context: findSentence(sourceText.value, word.original),
     explanation: word.explanation,
     level: word.level,
+    ...pageSource(location.href, document.title),
   })
 }
 
@@ -431,6 +433,7 @@ function saveSelectionWord(): void {
     translate: isReverse ? selected.text : word.translate,
     context: isReverse ? undefined : selectionContext(selected),
     level: word.level,
+    ...pageSource(location.href, document.title),
   })
 }
 

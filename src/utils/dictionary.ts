@@ -13,13 +13,45 @@ export type LevelFilter = CefrLevel | 'none'
 export type DictionaryFilters = {
   search: string
   level: LevelFilter | null
+  host: string | null
   onlyWithExplanation: boolean
 }
 
 export const EMPTY_FILTERS: DictionaryFilters = {
   search: '',
   level: null,
+  host: null,
   onlyWithExplanation: false,
+}
+
+/** Источник записи: адрес страницы без query и хэша, заголовок обрезан */
+export type WordSource = Pick<DictionaryEntry, 'sourceUrl' | 'sourceTitle'>
+
+const TITLE_LIMIT = 120
+
+/**
+ * Адрес чистим от query и хэша: важна страница, а не то, как на неё пришли, —
+ * иначе один и тот же пост считался бы разными источниками.
+ */
+export function pageSource(url: string, title: string): WordSource {
+  try {
+    const { origin, pathname } = new URL(url)
+
+    return { sourceUrl: origin + pathname, sourceTitle: title.trim().slice(0, TITLE_LIMIT) || undefined }
+  } catch {
+    return {}
+  }
+}
+
+/** Пусто — источника нет или адрес не разбирается */
+export function sourceHost(entry: DictionaryEntry): string {
+  if (!entry.sourceUrl) return ''
+
+  try {
+    return new URL(entry.sourceUrl).host
+  } catch {
+    return ''
+  }
 }
 
 /** Ключ дедупликации: «Flash  of Light» и «flash of light» — одно слово */
@@ -31,6 +63,8 @@ function matchesFilters(entry: DictionaryEntry, filters: DictionaryFilters): boo
   if (filters.level === 'none') {
     if (entry.level) return false
   } else if (filters.level && entry.level !== filters.level) return false
+
+  if (filters.host && sourceHost(entry) !== filters.host) return false
 
   if (filters.onlyWithExplanation && !entry.explanation) return false
 
@@ -84,6 +118,23 @@ export function levelFilterOptions(entries: DictionaryEntry[]): LevelOption[] {
   }
 
   return options
+}
+
+export type HostOption = { label: string; value: string }
+
+/** Хосты, реально встречающиеся в словаре; частые — выше, число записей в подписи */
+export function hostFilterOptions(entries: DictionaryEntry[]): HostOption[] {
+  const counts = new Map<string, number>()
+
+  for (const entry of entries) {
+    if (entry.deletedAt) continue
+
+    const host = sourceHost(entry)
+    if (host) counts.set(host, (counts.get(host) ?? 0) + 1)
+  }
+
+  return Array.from(counts, ([host, count]) => ({ label: `${host} (${count})`, value: host }))
+    .sort((a, b) => (counts.get(b.value) ?? 0) - (counts.get(a.value) ?? 0) || a.value.localeCompare(b.value))
 }
 
 /**

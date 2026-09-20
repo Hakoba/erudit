@@ -23,11 +23,14 @@ import { PROFILE_LANG } from '@/utils/analyze'
 import { CEFR_LEVELS, type CefrLevel, type DictionaryEntry } from '@/types/words'
 import {
   EMPTY_FILTERS,
+  hostFilterOptions,
   levelFilterOptions,
   queryEntries,
+  sourceHost,
   untranslatedEntries,
   type DictionaryFilters,
   type DictionarySort,
+  type HostOption,
   type LevelOption,
 } from '@/utils/dictionary'
 
@@ -93,6 +96,7 @@ const visibleEntries = computed<DictionaryEntry[]>(() =>
   queryEntries(entries.value, filters.value, sort.value),
 )
 const levelOptions = computed<LevelOption[]>(() => levelFilterOptions(entries.value))
+const hostOptions = computed<HostOption[]>(() => hostFilterOptions(entries.value))
 /** Слова, добавленные в словарь, пока источник перевода молчал */
 const missing = computed<DictionaryEntry[]>(() => untranslatedEntries(entries.value))
 const sortOptions = computed<{ label: string; value: DictionarySort }[]>(() => [
@@ -101,7 +105,12 @@ const sortOptions = computed<{ label: string; value: DictionarySort }[]>(() => [
   { label: t('dictionary.sortAlphabetical'), value: 'alphabetical' },
 ])
 const isFilterActive = computed<boolean>(() =>
-  Boolean(filters.value.search || filters.value.level || filters.value.onlyWithExplanation),
+  Boolean(
+    filters.value.search
+    || filters.value.level
+    || filters.value.host
+    || filters.value.onlyWithExplanation,
+  ),
 )
 const isDraftValid = computed<boolean>(() =>
   Boolean(draft.value.original.trim() && draft.value.translate.trim()),
@@ -467,6 +476,18 @@ function submitDraft(): void {
           />
 
           <Select
+            v-if="hostOptions.length"
+            v-model="filters.host"
+            :options="hostOptions"
+            option-label="label"
+            option-value="value"
+            :placeholder="t('dictionary.anyHost')"
+            show-clear
+            class="w-56"
+            :aria-label="t('dictionary.hostFilter')"
+          />
+
+          <Select
             v-model="sort"
             :options="sortOptions"
             option-label="label"
@@ -643,6 +664,17 @@ function submitDraft(): void {
                   >
                     {{ entry.explanation }}
                   </p>
+
+                  <a
+                    v-if="entry.sourceUrl"
+                    :href="entry.sourceUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="block truncate text-sm text-muted hover:underline"
+                    :aria-label="t('dictionary.sourceLink', { title: entry.sourceTitle || sourceHost(entry) })"
+                  >
+                    {{ entry.sourceTitle ? `${sourceHost(entry)} · ${entry.sourceTitle}` : sourceHost(entry) }}
+                  </a>
 
                   <!-- v-if, а не v-show: панель запрашивает словари при монтировании -->
                   <LookupPanel

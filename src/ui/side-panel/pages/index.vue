@@ -6,6 +6,7 @@ import { useDictionary } from '@/composables/useDictionary'
 import { useIgnoredWords } from '@/composables/useIgnoredWords'
 import { usePanelChannel } from '@/composables/usePanelChannel'
 import { useReaderSettings } from '@/composables/useReaderSettings'
+import { pageSource } from '@/utils/dictionary'
 import { findSentence } from '@/utils/sentence'
 import type { WordWithExplanation } from '@/types/words'
 
@@ -20,12 +21,15 @@ const { settings: readerSettings } = useReaderSettings()
 const { state, tabId, currentUrl, isOwnPage, command, reloadTab } = usePanelChannel()
 
 function addToDictionary(word: WordWithExplanation): void {
+  const page = state.value?.page
+
   addEntry({
     original: word.original,
     translate: word.translate,
     context: findSentence(state.value?.sourceText ?? '', word.original),
     explanation: word.explanation,
     level: word.level,
+    ...pageSource(page?.url ?? '', page?.title ?? ''),
   })
 }
 
