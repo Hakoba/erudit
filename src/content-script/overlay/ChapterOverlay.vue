@@ -271,19 +271,23 @@ onUnmounted((): void => {
 /**
  * `full` — читать страницу целиком: смена области и ручной перезапуск отменяют
  * прошлый разбор. Единственная развилка режимов: страница на языке перевода
- * при включённых вкраплениях идёт не в разбор, а в подмену слов.
+ * идёт не в разбор, а в подмену слов, а при выключенной подмене — никуда:
+ * модель на родном тексте «находит» родные слова и переводит их сами в себя.
  */
 async function analyze(full = false): Promise<void> {
   isStarted.value = true
 
-  if (readerSettings.value.immersion) {
-    const { sourceLang, targetLang } = readerSettings.value
-    const pageText = await extractReadableText()
+  const { sourceLang, targetLang, immersion } = readerSettings.value
+  const pageText = await extractReadableText()
 
-    if (isTargetLanguageText(pageText, targetLang, sourceLang, document.documentElement.lang)) {
+  if (isTargetLanguageText(pageText, targetLang, sourceLang, document.documentElement.lang)) {
+    if (immersion) {
       startImmersion(pageText)
       return
     }
+
+    errorMessage.value = t('errors.nativePage')
+    return
   }
 
   if (isImmersionActive.value) {

@@ -444,6 +444,7 @@ export default {
     dictKeyRejected: 'Yandex Dictionary rejected the key — check it in the settings',
     profileOnlyEnglish: 'The offline CEFR profile only covers English. For this language, switch the analysis to a model in the settings.',
     translatorKeyRejected: '{title} rejected the key — check it in the settings',
+    nativePage: 'This page is in your translation language, so there is nothing to analyse. Turn on “Immersion” to review words from your dictionary on pages like this.',
     noText: 'No text to analyse was found on the page',
     noNewText: 'No new text on the page yet — it may still be loading',
     translationMissing: 'no translation found',

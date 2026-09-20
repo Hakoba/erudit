@@ -444,6 +444,7 @@ export default {
     dictKeyRejected: 'O Yandex Dictionary rejeitou a chave — verifica-a nas definições',
     profileOnlyEnglish: 'O perfil CEFR offline só cobre o inglês. Para este idioma muda a análise para um modelo nas definições.',
     translatorKeyRejected: '{title} rejeitou a chave — verifica-a nas definições',
+    nativePage: 'Esta página está no seu idioma de tradução, então não há nada para analisar. Ative a «Imersão» para revisar aqui as palavras do seu dicionário.',
     noText: 'Não se encontrou texto para analisar na página',
     noNewText: 'Ainda não há texto novo na página: pode ainda estar a carregar',
     translationMissing: 'tradução não encontrada',

@@ -19,7 +19,9 @@ declare global {
   const DEFAULT_DICT_SETTINGS: typeof import('../composables/useDictSettings').DEFAULT_DICT_SETTINGS
   const DEFAULT_LLM_SETTINGS: typeof import('../composables/useLlmSettings').DEFAULT_LLM_SETTINGS
   const DEFAULT_READER_SETTINGS: typeof import('../composables/useReaderSettings').DEFAULT_READER_SETTINGS
+  const DEMO_LEVELS: typeof import('../utils/demoDictionary').DEMO_LEVELS
   const DEMO_URL: typeof import('../composables/useAccessSites').DEMO_URL
+  const DEMO_WORDS: typeof import('../utils/demoDictionary').DEMO_WORDS
   const DICTIONARY_KEY: typeof import('../utils/dictionary').DICTIONARY_KEY
   const DICTIONARY_URL: typeof import('../utils/dictionaryTab').DICTIONARY_URL
   const DOCK_WIDTH: typeof import('../composables/useOverlayDock').DOCK_WIDTH
@@ -87,6 +89,7 @@ declare global {
   const checkModel: typeof import('../utils/llmClient').checkModel
   const chunk: typeof import('../utils/dictionary').chunk
   const chunkByChars: typeof import('../utils/mt/translators').chunkByChars
+  const clampDemoLevel: typeof import('../utils/demoDictionary').clampDemoLevel
   const clearHighlights: typeof import('../utils/highlight').clearHighlights
   const collectLevels: typeof import('../utils/dictionary').collectLevels
   const computed: typeof import('vue').computed
@@ -156,6 +159,7 @@ declare global {
   const hasOccurrence: typeof import('../utils/highlight').hasOccurrence
   const highlightTerms: typeof import('../utils/highlight').highlightTerms
   const hintAttrs: typeof import('../utils/hint').hintAttrs
+  const hostFilterOptions: typeof import('../utils/dictionary').hostFilterOptions
   const hostsOf: typeof import('../composables/useHostAccess').hostsOf
   const i18n: typeof import('../utils/i18n').i18n
   const ignorableWatch: typeof import('@vueuse/core').ignorableWatch
@@ -233,6 +237,7 @@ declare global {
   const openDictionaryTab: typeof import('../utils/dictionaryTab').openDictionaryTab
   const openOptionsTab: typeof import('../utils/dictionaryTab').openOptionsTab
   const originPattern: typeof import('../composables/matchesSite').originPattern
+  const pageSource: typeof import('../utils/dictionary').pageSource
   const panelStateFromMessage: typeof import('../utils/panelBus').panelStateFromMessage
   const parseApkg: typeof import('../utils/anki').parseApkg
   const parseBackup: typeof import('../utils/backup').parseBackup
@@ -277,6 +282,7 @@ declare global {
   const resolveUnref: typeof import('@vueuse/core').resolveUnref
   const restoreReplacement: typeof import('../utils/highlight').restoreReplacement
   const revealTerm: typeof import('../utils/highlight').revealTerm
+  const reverseTranslate: typeof import('../utils/translateTerm').reverseTranslate
   const reviewEntry: typeof import('../utils/srs').reviewEntry
   const reviewWord: typeof import('../utils/cefr/levels').reviewWord
   const reviewWords: typeof import('../utils/cefr/levels').reviewWords
@@ -289,6 +295,7 @@ declare global {
   const shallowReactive: typeof import('vue').shallowReactive
   const shallowReadonly: typeof import('vue').shallowReadonly
   const shallowRef: typeof import('vue').shallowRef
+  const sourceHost: typeof import('../utils/dictionary').sourceHost
   const splitItem: typeof import('../utils/changelog').splitItem
   const storeToRefs: typeof import('pinia').storeToRefs
   const stripHtml: typeof import('../utils/anki').stripHtml
@@ -363,6 +370,7 @@ declare global {
   const useDebounce: typeof import('@vueuse/core').useDebounce
   const useDebounceFn: typeof import('@vueuse/core').useDebounceFn
   const useDebouncedRefHistory: typeof import('@vueuse/core').useDebouncedRefHistory
+  const useDemoDictionary: typeof import('../composables/useDemoDictionary').useDemoDictionary
   const useDeviceMotion: typeof import('@vueuse/core').useDeviceMotion
   const useDeviceOrientation: typeof import('@vueuse/core').useDeviceOrientation
   const useDevicePixelRatio: typeof import('@vueuse/core').useDevicePixelRatio
@@ -387,6 +395,7 @@ declare global {
   const useFetch: typeof import('@vueuse/core').useFetch
   const useFileDialog: typeof import('@vueuse/core').useFileDialog
   const useFileSystemAccess: typeof import('@vueuse/core').useFileSystemAccess
+  const useFillTranslations: typeof import('../composables/useFillTranslations').useFillTranslations
   const useFocus: typeof import('@vueuse/core').useFocus
   const useFocusWithin: typeof import('@vueuse/core').useFocusWithin
   const useFps: typeof import('@vueuse/core').useFps
@@ -533,11 +542,17 @@ declare global {
   export type { AreaSelector } from '../composables/useAreaSelectors'
   import('../composables/useAreaSelectors')
   // @ts-ignore
+  export type { DemoState } from '../composables/useDemoDictionary'
+  import('../composables/useDemoDictionary')
+  // @ts-ignore
   export type { DictSettings } from '../composables/useDictSettings'
   import('../composables/useDictSettings')
   // @ts-ignore
   export type { NewDictionaryEntry } from '../composables/useDictionary'
   import('../composables/useDictionary')
+  // @ts-ignore
+  export type { FillState } from '../composables/useFillTranslations'
+  import('../composables/useFillTranslations')
   // @ts-ignore
   export type { HoverHint } from '../composables/useHighlightHover'
   import('../composables/useHighlightHover')
@@ -575,13 +590,16 @@ declare global {
   export type { ChangelogKind, ChangelogItem, ChangelogGroup, ChangelogSection } from '../utils/changelog'
   import('../utils/changelog')
   // @ts-ignore
+  export type { DemoLevel } from '../utils/demoDictionary'
+  import('../utils/demoDictionary')
+  // @ts-ignore
   export type { DictLink, LinkLangs } from '../utils/dict/links'
   import('../utils/dict/links')
   // @ts-ignore
   export type { LookupOutcome } from '../utils/dictClient'
   import('../utils/dictClient')
   // @ts-ignore
-  export type { DictionarySort, LevelFilter, DictionaryFilters, LevelOption } from '../utils/dictionary'
+  export type { DictionarySort, LevelFilter, DictionaryFilters, WordSource, LevelOption, HostOption } from '../utils/dictionary'
   import('../utils/dictionary')
   // @ts-ignore
   export type { SiteRule } from '../utils/extract/rules'
@@ -630,7 +648,9 @@ declare module 'vue' {
     readonly DEFAULT_DICT_SETTINGS: UnwrapRef<typeof import('../composables/useDictSettings')['DEFAULT_DICT_SETTINGS']>
     readonly DEFAULT_LLM_SETTINGS: UnwrapRef<typeof import('../composables/useLlmSettings')['DEFAULT_LLM_SETTINGS']>
     readonly DEFAULT_READER_SETTINGS: UnwrapRef<typeof import('../composables/useReaderSettings')['DEFAULT_READER_SETTINGS']>
+    readonly DEMO_LEVELS: UnwrapRef<typeof import('../utils/demoDictionary')['DEMO_LEVELS']>
     readonly DEMO_URL: UnwrapRef<typeof import('../composables/useAccessSites')['DEMO_URL']>
+    readonly DEMO_WORDS: UnwrapRef<typeof import('../utils/demoDictionary')['DEMO_WORDS']>
     readonly DICTIONARY_KEY: UnwrapRef<typeof import('../utils/dictionary')['DICTIONARY_KEY']>
     readonly DICTIONARY_URL: UnwrapRef<typeof import('../utils/dictionaryTab')['DICTIONARY_URL']>
     readonly DOCK_WIDTH: UnwrapRef<typeof import('../composables/useOverlayDock')['DOCK_WIDTH']>
@@ -694,6 +714,7 @@ declare module 'vue' {
     readonly checkModel: UnwrapRef<typeof import('../utils/llmClient')['checkModel']>
     readonly chunk: UnwrapRef<typeof import('../utils/dictionary')['chunk']>
     readonly chunkByChars: UnwrapRef<typeof import('../utils/mt/translators')['chunkByChars']>
+    readonly clampDemoLevel: UnwrapRef<typeof import('../utils/demoDictionary')['clampDemoLevel']>
     readonly clearHighlights: UnwrapRef<typeof import('../utils/highlight')['clearHighlights']>
     readonly collectLevels: UnwrapRef<typeof import('../utils/dictionary')['collectLevels']>
     readonly computed: UnwrapRef<typeof import('vue')['computed']>
@@ -763,6 +784,7 @@ declare module 'vue' {
     readonly hasOccurrence: UnwrapRef<typeof import('../utils/highlight')['hasOccurrence']>
     readonly highlightTerms: UnwrapRef<typeof import('../utils/highlight')['highlightTerms']>
     readonly hintAttrs: UnwrapRef<typeof import('../utils/hint')['hintAttrs']>
+    readonly hostFilterOptions: UnwrapRef<typeof import('../utils/dictionary')['hostFilterOptions']>
     readonly hostsOf: UnwrapRef<typeof import('../composables/useHostAccess')['hostsOf']>
     readonly i18n: UnwrapRef<typeof import('../utils/i18n')['i18n']>
     readonly ignorableWatch: UnwrapRef<typeof import('@vueuse/core')['ignorableWatch']>
@@ -839,6 +861,7 @@ declare module 'vue' {
     readonly openDictionaryTab: UnwrapRef<typeof import('../utils/dictionaryTab')['openDictionaryTab']>
     readonly openOptionsTab: UnwrapRef<typeof import('../utils/dictionaryTab')['openOptionsTab']>
     readonly originPattern: UnwrapRef<typeof import('../composables/matchesSite')['originPattern']>
+    readonly pageSource: UnwrapRef<typeof import('../utils/dictionary')['pageSource']>
     readonly panelStateFromMessage: UnwrapRef<typeof import('../utils/panelBus')['panelStateFromMessage']>
     readonly parseApkg: UnwrapRef<typeof import('../utils/anki')['parseApkg']>
     readonly parseBackup: UnwrapRef<typeof import('../utils/backup')['parseBackup']>
@@ -881,6 +904,7 @@ declare module 'vue' {
     readonly resolveUnref: UnwrapRef<typeof import('@vueuse/core')['resolveUnref']>
     readonly restoreReplacement: UnwrapRef<typeof import('../utils/highlight')['restoreReplacement']>
     readonly revealTerm: UnwrapRef<typeof import('../utils/highlight')['revealTerm']>
+    readonly reverseTranslate: UnwrapRef<typeof import('../utils/translateTerm')['reverseTranslate']>
     readonly reviewEntry: UnwrapRef<typeof import('../utils/srs')['reviewEntry']>
     readonly reviewWord: UnwrapRef<typeof import('../utils/cefr/levels')['reviewWord']>
     readonly reviewWords: UnwrapRef<typeof import('../utils/cefr/levels')['reviewWords']>
@@ -893,6 +917,7 @@ declare module 'vue' {
     readonly shallowReactive: UnwrapRef<typeof import('vue')['shallowReactive']>
     readonly shallowReadonly: UnwrapRef<typeof import('vue')['shallowReadonly']>
     readonly shallowRef: UnwrapRef<typeof import('vue')['shallowRef']>
+    readonly sourceHost: UnwrapRef<typeof import('../utils/dictionary')['sourceHost']>
     readonly splitItem: UnwrapRef<typeof import('../utils/changelog')['splitItem']>
     readonly storeToRefs: UnwrapRef<typeof import('pinia')['storeToRefs']>
     readonly stripHtml: UnwrapRef<typeof import('../utils/anki')['stripHtml']>
@@ -967,6 +992,7 @@ declare module 'vue' {
     readonly useDebounce: UnwrapRef<typeof import('@vueuse/core')['useDebounce']>
     readonly useDebounceFn: UnwrapRef<typeof import('@vueuse/core')['useDebounceFn']>
     readonly useDebouncedRefHistory: UnwrapRef<typeof import('@vueuse/core')['useDebouncedRefHistory']>
+    readonly useDemoDictionary: UnwrapRef<typeof import('../composables/useDemoDictionary')['useDemoDictionary']>
     readonly useDeviceMotion: UnwrapRef<typeof import('@vueuse/core')['useDeviceMotion']>
     readonly useDeviceOrientation: UnwrapRef<typeof import('@vueuse/core')['useDeviceOrientation']>
     readonly useDevicePixelRatio: UnwrapRef<typeof import('@vueuse/core')['useDevicePixelRatio']>
@@ -991,6 +1017,7 @@ declare module 'vue' {
     readonly useFetch: UnwrapRef<typeof import('@vueuse/core')['useFetch']>
     readonly useFileDialog: UnwrapRef<typeof import('@vueuse/core')['useFileDialog']>
     readonly useFileSystemAccess: UnwrapRef<typeof import('@vueuse/core')['useFileSystemAccess']>
+    readonly useFillTranslations: UnwrapRef<typeof import('../composables/useFillTranslations')['useFillTranslations']>
     readonly useFocus: UnwrapRef<typeof import('@vueuse/core')['useFocus']>
     readonly useFocusWithin: UnwrapRef<typeof import('@vueuse/core')['useFocusWithin']>
     readonly useFps: UnwrapRef<typeof import('@vueuse/core')['useFps']>

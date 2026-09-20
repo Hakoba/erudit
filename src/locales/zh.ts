@@ -444,6 +444,7 @@ export default {
     dictKeyRejected: 'Yandex 词典拒绝了密钥——请在设置中检查',
     profileOnlyEnglish: '离线 CEFR 词表只覆盖英语。这个语言请在设置中把分析切换为模型。',
     translatorKeyRejected: '{title} 拒绝了密钥——请在设置中检查',
+    nativePage: '此页面使用你的翻译语言，没有可分析的内容。开启“嵌入”即可在这类页面复习词典中的单词。',
     noText: '页面上没有找到可分析的文本',
     noNewText: '页面上暂时没有新内容，可能还在加载',
     translationMissing: '未找到翻译',

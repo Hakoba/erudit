@@ -444,6 +444,7 @@ export default {
     dictKeyRejected: 'Yandex 사전이 키를 거부했습니다 — 설정에서 확인하세요',
     profileOnlyEnglish: '오프라인 CEFR 목록은 영어만 다룹니다. 이 언어는 설정에서 분석을 모델로 바꾸세요.',
     translatorKeyRejected: '{title}이(가) 키를 거부했습니다 — 설정에서 확인하세요',
+    nativePage: '이 페이지는 번역 언어로 되어 있어 분석할 내용이 없습니다. «끼워 넣기»를 켜면 이런 페이지에서 사전의 단어를 복습할 수 있습니다.',
     noText: '페이지에서 분석할 텍스트를 찾지 못했습니다',
     noNewText: '페이지에 아직 새로운 본문이 없습니다. 아직 불러오는 중일 수 있습니다',
     translationMissing: '번역을 찾지 못함',
