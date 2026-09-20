@@ -12,6 +12,7 @@ import sqlWasmUrl from 'sql.js/dist/sql-wasm.wasm?url'
 import { parseApkg } from '@/utils/anki'
 import LookupPanel from '@/components/LookupPanel.vue'
 import { dictTranslate } from '@/utils/translateTerm'
+import { requestExplanation } from '@/utils/llmClient'
 import { useAnkiExport } from '@/composables/useAnkiExport'
 import { useDemoDictionary } from '@/composables/useDemoDictionary'
 import { useDictionary } from '@/composables/useDictionary'
@@ -77,6 +78,9 @@ const editingId = ref<string>('')
 const editedTranslate = ref<string>('')
 // раскрыта одна справка за раз: иначе список превращается в простыню
 const lookupId = ref<string>('')
+// пояснение просят по одной записи; отказ модели показываем у той же строки
+const explainingId = ref<string>('')
+const explainError = ref<{ id: string; message: string }>({ id: '', message: '' })
 const isFormOpen = ref<boolean>(false)
 const isSuggesting = ref<boolean>(false)
 const importState = ref<{ busy: boolean; message: string; failed: boolean }>({
@@ -132,6 +136,25 @@ function saveEditing(): void {
   const translate = editedTranslate.value.trim()
   if (translate) updateEntry(editingId.value, { translate })
   editingId.value = ''
+}
+
+/** Пояснение к записи из словаря — модели хватает предложения-контекста, страницы у неё уже нет */
+async function explainEntry(entry: DictionaryEntry): Promise<void> {
+  if (explainingId.value) return
+
+  explainingId.value = entry.id
+  explainError.value = { id: '', message: '' }
+
+  try {
+    const text = await requestExplanation(entry.original, entry.context ?? '')
+    if (!text) throw new Error(t('overlay.explanationFailed'))
+
+    updateEntry(entry.id, { explanation: text })
+  } catch (error) {
+    explainError.value = { id: entry.id, message: error instanceof Error ? error.message : t('overlay.explanationFailed') }
+  } finally {
+    explainingId.value = ''
+  }
 }
 
 /**
@@ -664,6 +687,38 @@ function submitDraft(): void {
                   >
                     {{ entry.explanation }}
                   </p>
+                  <!-- пояснения нет — модель зовём по кнопке, как в карточке: запрос платный -->
+                  <div
+                    v-else
+                    class="flex flex-wrap items-center gap-2 text-sm"
+                  >
+                    <Button
+                      size="small"
+                      severity="secondary"
+                      text
+                      :disabled="Boolean(explainingId)"
+                      :label="t(explainingId === entry.id ? 'overlay.explanationLoading' : 'overlay.explanation')"
+                      @click="explainEntry(entry)"
+                    >
+                      <template #icon>
+                        <AppLoader
+                          v-if="explainingId === entry.id"
+                          variant="orbit"
+                          :size="16"
+                        />
+                        <Sparkles
+                          v-else
+                          :size="16"
+                        />
+                      </template>
+                    </Button>
+                    <span
+                      v-if="explainError.id === entry.id"
+                      class="text-red-500"
+                    >
+                      {{ explainError.message }}
+                    </span>
+                  </div>
 
                   <a
                     v-if="entry.sourceUrl"
