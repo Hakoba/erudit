@@ -121,6 +121,8 @@ const isDraftValid = computed<boolean>(() =>
 )
 /** Наборы собраны только по английскому: на другом языке чтения кнопок нет */
 const isDemoOffered = computed<boolean>(() => settings.value.sourceLang === PROFILE_LANG)
+// кнопка пояснения — только при выбранной модели: без неё запрос упрётся в ошибку подключения
+const isModelOn = computed<boolean>(() => settings.value.engine === 'llm')
 
 // методы
 function resetFilters(): void {
@@ -689,7 +691,7 @@ function submitDraft(): void {
                   </p>
                   <!-- пояснения нет — модель зовём по кнопке, как в карточке: запрос платный -->
                   <div
-                    v-else
+                    v-else-if="isModelOn"
                     class="flex flex-wrap items-center gap-2 text-sm"
                   >
                     <Button

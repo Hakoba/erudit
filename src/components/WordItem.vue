@@ -7,6 +7,7 @@ import AppLoader from '@/components/AppLoader.vue'
 import LookupPanel from '@/components/LookupPanel.vue'
 import type { WordWithExplanation } from '@/types/words'
 import { useDictionary } from '@/composables/useDictionary'
+import { useReaderSettings } from '@/composables/useReaderSettings'
 import { requestExplanation } from '@/utils/llmClient'
 import { findSentence } from '@/utils/sentence'
 import { hintAttrs } from '@/utils/hint'
@@ -30,6 +31,7 @@ const emit = defineEmits<{
 // composables
 const { t } = useI18n()
 const { hasEntry } = useDictionary()
+const { settings: readerSettings } = useReaderSettings()
 
 // state
 const isTipsOpen = ref<boolean>(false)
@@ -41,6 +43,8 @@ const tipsId = computed<string>(
   () => `nt-tips-${props.word.original.replace(/[^a-zA-Z0-9_-]+/g, '-')}`,
 )
 const isSaved = computed<boolean>(() => hasEntry(props.word.original))
+// без выбранной модели кнопка вела бы в ошибку подключения: слова ищет словарь, модели нет
+const isModelOn = computed<boolean>(() => readerSettings.value.engine === 'llm')
 
 // методы
 /** Пояснение модели — отдельной кнопкой: раскрытие карточки должно оставаться бесплатным */
@@ -183,7 +187,7 @@ function addToDictionary(): void {
         {{ isExplanationLoading ? t('overlay.explanationLoading') : explanation }}
       </p>
 
-      <div v-else>
+      <div v-else-if="isModelOn">
         <Button
           size="small"
           severity="secondary"
