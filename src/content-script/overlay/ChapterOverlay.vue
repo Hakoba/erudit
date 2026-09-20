@@ -17,7 +17,7 @@ import { useHighlightHover } from '@/composables/useHighlightHover'
 import { useIgnoredWords } from '@/composables/useIgnoredWords'
 import { useOverlayDock } from '@/composables/useOverlayDock'
 import { type SelectionMode, useReaderSettings } from '@/composables/useReaderSettings'
-import { type SelectionAnchor, useTextSelection } from '@/composables/useTextSelection'
+import { isFromOverlay, type SelectionAnchor, useTextSelection } from '@/composables/useTextSelection'
 import { startAreaPicker } from '@/content-script/areaPicker'
 import { isPanelOpen, publishPanelState, releasePanelCommandHandler, requestPanelOpen, setPanelCommandHandler } from '@/content-script/panelBridge'
 import type { PanelCommand } from '@/utils/panelBus'
@@ -231,6 +231,25 @@ watch(() => readerSettings.value.immersion, (): void => {
 })
 
 /**
+ * Аккордеоны, «ещё N ответов», «читать дальше» раскрываются кликом, и текст
+ * появляется без смены адреса. MutationObserver на чужой странице стоит дорого
+ * (reddit мутирует DOM без остановки), а клик — редкий и уже пользовательский
+ * жест: после него пересобираем текст, а `useDifficultWords` сам отправит только
+ * дописанное или ничего. Раскрытие скриптом и с клавиатуры остаётся «Перечитать».
+ */
+const RECHECK_DELAY_MS = 700
+let recheckTimer: ReturnType<typeof setTimeout> | undefined
+
+function onPageInteraction(event: Event): void {
+  if (isFromOverlay(event)) return
+  // не начинали, идёт разбор, режим вкраплений или выбор области — переразбирать нечего
+  if (!isStarted.value || isLoading.value || isImmersionActive.value || cancelPicking.value) return
+
+  clearTimeout(recheckTimer)
+  recheckTimer = setTimeout(() => void analyze(), RECHECK_DELAY_MS)
+}
+
+/**
  * Авторазбор в скрытой вкладке — запросы впустую: словарь жжёт общую суточную
  * квоту ключа, модель — токены. Ждём первого показа вкладки — к чтению разбор
  * уже идёт. Заодно накрывает prerender: у него visibilityState тоже `hidden`.
@@ -239,6 +258,10 @@ let stopVisibilityWait: (() => void) | null = null
 
 // lifecycle
 onMounted(async (): Promise<void> => {
+  // capture: сайт может остановить всплытие клика у себя; `toggle` не всплывает вовсе
+  document.addEventListener('click', onPageInteraction, true)
+  document.addEventListener('toggle', onPageInteraction, true)
+
   await readerSettingsLoaded
   if (!readerSettings.value.autoAnalyze) return
 
@@ -262,6 +285,9 @@ onMounted(async (): Promise<void> => {
 onUnmounted((): void => {
   // SPA сменила адрес в фоне — прежний оверлей не должен разбирать из могилы
   stopVisibilityWait?.()
+  clearTimeout(recheckTimer)
+  document.removeEventListener('click', onPageInteraction, true)
+  document.removeEventListener('toggle', onPageInteraction, true)
   clearHighlights()
   cancelPicking.value?.()
   releasePanelCommandHandler(handlePanelCommand)

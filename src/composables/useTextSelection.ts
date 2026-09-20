@@ -33,7 +33,7 @@ function contextAround(element: Element | null, term: string): string | undefine
  * поэтому по нему и отличаем свои клики от кликов по странице. Без этого клик
  * по кнопке «в словарь» сбрасывал бы выделение раньше, чем успевал сработать.
  */
-function isFromOverlay(event: Event): boolean {
+export function isFromOverlay(event: Event): boolean {
   return event.target instanceof Element && Boolean(event.target.closest(`#${OVERLAY_ROOT_ID}`))
 }
 

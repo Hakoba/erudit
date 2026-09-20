@@ -47,9 +47,12 @@ function visibleText(root: Element): string {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, {
     acceptNode: (node: Node): number => {
       if (node instanceof Element) {
-        return SKIP_TAGS.has(node.tagName.toUpperCase())
-          ? NodeFilter.FILTER_REJECT
-          : NodeFilter.FILTER_SKIP
+        // свёрнутый аккордеон, закрытый details, «показать ещё»: текст есть в DOM,
+        // а читателю не виден — в разбор он уходил бы за деньги и не подсвечивался.
+        // `checkVisibility` видит и display:none у предка, и content-visibility
+        if (SKIP_TAGS.has(node.tagName.toUpperCase()) || !node.checkVisibility()) return NodeFilter.FILTER_REJECT
+
+        return NodeFilter.FILTER_SKIP
       }
 
       return NodeFilter.FILTER_ACCEPT
