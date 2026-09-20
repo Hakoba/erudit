@@ -111,7 +111,8 @@ export async function requestExplanation(target: string, context: string): Promi
 
   const content = await chat([
     { role: 'system', content: systemPrompt(promptExtra) },
-    { role: 'user', content: `Given the provided context text, explain briefly in ${answerLang} (1–2 sentences) the meaning/usage/nuance of the given ${languageName(sourceLang)} word or phrase. Return ONLY plain ${answerLang} text without quotes, markdown, code fences, or extra commentary.` },
+    // контекст только выбирает значение: иначе модель пересказывает абзац вместо слова
+    { role: 'user', content: `Explain briefly in ${answerLang} (1–2 sentences) what the given ${languageName(sourceLang)} word or phrase means in general and how it is typically used. Use the context sentence only to pick the right sense — do not retell or refer to it. Return ONLY plain ${answerLang} text without quotes, markdown, code fences, or extra commentary.` },
     { role: 'user', content: `Word/Phrase: ${target}` },
     { role: 'user', content: `Context:\n${context}` },
   ])

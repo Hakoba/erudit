@@ -8,6 +8,7 @@ import LookupPanel from '@/components/LookupPanel.vue'
 import type { WordWithExplanation } from '@/types/words'
 import { useDictionary } from '@/composables/useDictionary'
 import { requestExplanation } from '@/utils/llmClient'
+import { findSentence } from '@/utils/sentence'
 import { hintAttrs } from '@/utils/hint'
 
 const props = defineProps<{
@@ -49,7 +50,8 @@ async function loadExplanation(): Promise<void> {
   isExplanationLoading.value = true
 
   try {
-    const text = await requestExplanation(props.word.original, props.sourceText)
+    // модели хватает предложения: страница целиком и дороже, и тянет пересказывать её
+    const text = await requestExplanation(props.word.original, findSentence(props.sourceText, props.word.original) ?? '')
     explanation.value = text || t('overlay.explanationFailed')
   } catch {
     explanation.value = t('overlay.explanationFailed')
