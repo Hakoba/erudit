@@ -39,6 +39,7 @@ declare global {
   const MODEL_NAME: typeof import('../utils/ankiSchema').MODEL_NAME
   const NO_HOST_ACCESS: typeof import('../utils/bgFetch').NO_HOST_ACCESS
   const OPENAI_COMPATIBLE_PRESETS: typeof import('../composables/useLlmSettings').OPENAI_COMPATIBLE_PRESETS
+  const OPTIONS_SECTIONS: typeof import('../utils/dictionaryTab').OPTIONS_SECTIONS
   const OVERLAY_ROOT_ID: typeof import('../utils/overlayRoot').OVERLAY_ROOT_ID
   const PANEL_COMMAND: typeof import('../utils/panelBus').PANEL_COMMAND
   const PANEL_GET: typeof import('../utils/panelBus').PANEL_GET
@@ -169,6 +170,8 @@ declare global {
   const isBelow: typeof import('../utils/cefr/levels').isBelow
   const isBundledKey: typeof import('../composables/useDictSettings').isBundledKey
   const isDefined: typeof import('@vueuse/core').isDefined
+  const isFromOverlay: typeof import('../composables/useTextSelection').isFromOverlay
+  const isOptionsSection: typeof import('../utils/dictionaryTab').isOptionsSection
   const isPanelCommand: typeof import('../utils/panelBus').isPanelCommand
   const isPanelState: typeof import('../utils/panelBus').isPanelState
   const isProxy: typeof import('vue').isProxy
@@ -236,6 +239,7 @@ declare global {
   const onWatcherCleanup: typeof import('vue').onWatcherCleanup
   const openDictionaryTab: typeof import('../utils/dictionaryTab').openDictionaryTab
   const openOptionsTab: typeof import('../utils/dictionaryTab').openOptionsTab
+  const optionsSectionUrl: typeof import('../utils/dictionaryTab').optionsSectionUrl
   const originPattern: typeof import('../composables/matchesSite').originPattern
   const pageSource: typeof import('../utils/dictionary').pageSource
   const panelStateFromMessage: typeof import('../utils/panelBus').panelStateFromMessage
@@ -602,6 +606,9 @@ declare global {
   export type { DictionarySort, LevelFilter, DictionaryFilters, WordSource, LevelOption, HostOption } from '../utils/dictionary'
   import('../utils/dictionary')
   // @ts-ignore
+  export type { OptionsSection } from '../utils/dictionaryTab'
+  import('../utils/dictionaryTab')
+  // @ts-ignore
   export type { SiteRule } from '../utils/extract/rules'
   import('../utils/extract/rules')
   // @ts-ignore
@@ -666,6 +673,7 @@ declare module 'vue' {
     readonly MODEL_NAME: UnwrapRef<typeof import('../utils/ankiSchema')['MODEL_NAME']>
     readonly NO_HOST_ACCESS: UnwrapRef<typeof import('../utils/bgFetch')['NO_HOST_ACCESS']>
     readonly OPENAI_COMPATIBLE_PRESETS: UnwrapRef<typeof import('../composables/useLlmSettings')['OPENAI_COMPATIBLE_PRESETS']>
+    readonly OPTIONS_SECTIONS: UnwrapRef<typeof import('../utils/dictionaryTab')['OPTIONS_SECTIONS']>
     readonly OVERLAY_ROOT_ID: UnwrapRef<typeof import('../utils/overlayRoot')['OVERLAY_ROOT_ID']>
     readonly PANEL_COMMAND: UnwrapRef<typeof import('../utils/panelBus')['PANEL_COMMAND']>
     readonly PANEL_GET: UnwrapRef<typeof import('../utils/panelBus')['PANEL_GET']>
@@ -793,6 +801,8 @@ declare module 'vue' {
     readonly intervalDays: UnwrapRef<typeof import('../utils/srs')['intervalDays']>
     readonly isBelow: UnwrapRef<typeof import('../utils/cefr/levels')['isBelow']>
     readonly isDefined: UnwrapRef<typeof import('@vueuse/core')['isDefined']>
+    readonly isFromOverlay: UnwrapRef<typeof import('../composables/useTextSelection')['isFromOverlay']>
+    readonly isOptionsSection: UnwrapRef<typeof import('../utils/dictionaryTab')['isOptionsSection']>
     readonly isPanelCommand: UnwrapRef<typeof import('../utils/panelBus')['isPanelCommand']>
     readonly isPanelState: UnwrapRef<typeof import('../utils/panelBus')['isPanelState']>
     readonly isProxy: UnwrapRef<typeof import('vue')['isProxy']>
@@ -860,6 +870,7 @@ declare module 'vue' {
     readonly onWatcherCleanup: UnwrapRef<typeof import('vue')['onWatcherCleanup']>
     readonly openDictionaryTab: UnwrapRef<typeof import('../utils/dictionaryTab')['openDictionaryTab']>
     readonly openOptionsTab: UnwrapRef<typeof import('../utils/dictionaryTab')['openOptionsTab']>
+    readonly optionsSectionUrl: UnwrapRef<typeof import('../utils/dictionaryTab')['optionsSectionUrl']>
     readonly originPattern: UnwrapRef<typeof import('../composables/matchesSite')['originPattern']>
     readonly pageSource: UnwrapRef<typeof import('../utils/dictionary')['pageSource']>
     readonly panelStateFromMessage: UnwrapRef<typeof import('../utils/panelBus')['panelStateFromMessage']>
