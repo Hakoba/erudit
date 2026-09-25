@@ -10,40 +10,106 @@
 приватности: из коробки слова уходят словарям без выбора пользователя, ключи
 синхронизирует браузер — так и пишем.
 
+## Как карточка ищется
+
+Поиск стора смотрит на название, краткое описание и первые строки подробного.
+Поэтому запросы стоят там естественными фразами, по одному разу, без повторов и
+списков синонимов — повторы стор считает спамом. Целевые запросы: «учить слова при
+чтении», «подсветка незнакомых слов», «перевод при наведении», «словарь для изучения
+языка», «интервальное повторение», «экспорт в Anki»; по-английски — learn vocabulary
+while reading, highlight unknown words, hover translation, spaced repetition, Anki export.
+
+Название в сторе берётся из манифеста и в панели не правится. Сейчас это «Erudit»;
+описательный хвост в названии («Erudit — учите слова при чтении») заметно помогает
+поиску, но требует новой сборки и покажется в заголовке боковой панели.
+
 ## Краткое описание (≤ 132 символа)
 
-Сложные слова на страницах, которые вы читаете: подсветка, словарь и тренировка.
+Учите слова при чтении: подсветка незнакомых слов, перевод при наведении, личный
+словарь и повторение по интервалам.
 
 ## Подробное описание
 
-Erudit помогает учить слова иностранного языка по тем текстам, которые вы и так
-читаете. На разрешённых вами сайтах он подсвечивает слова и фразы выше вашего
-уровня, показывает перевод при наведении и складывает их в личный словарь. Текст
-остаётся нетронутым: страница не переводится целиком.
+Erudit — расширение для изучения слов иностранного языка по тем текстам, которые вы
+и так читаете: статьи, форумы, книги онлайн. На разрешённых вами сайтах оно
+подсвечивает незнакомые слова выше вашего уровня, показывает перевод при наведении
+и складывает слова в личный словарь с интервальным повторением. Страница не
+переводится целиком: вы читаете в оригинале, а подсказка приходит только к трудному.
 
-Как учатся слова:
-• Читаете в оригинале — новые слова подсвечены, перевод по наведению.
-• Сохраняете нужные в словарь одним кликом из боковой панели.
-• Встречаете их снова: на страницах на родном языке сохранённые слова вплетаются
-  в текст, и вы вспоминаете их в живом контексте.
-• Повторяете по интервалам в тренировке; словарь можно выгрузить в Anki.
+Как это работает
+• Подсветка сложных слов прямо в тексте, с учётом вашего уровня A1–C2.
+• Перевод слова или фразы при наведении и по выделению.
+• Личный словарь: слово, перевод, предложение-контекст и страница, где встретилось.
+• Тренировка по интервалам 1, 3, 7, 16, 35 и 90 дней.
+• Повторение в живом контексте: на страницах на родном языке сохранённые слова
+  вплетаются в текст, и вы вспоминаете их по ходу чтения.
+• Статистика: сколько слов на каком уровне, откуда они пришли, сколько страниц прочитано.
+• Экспорт словаря в Anki.
 
-Ещё:
-• Перевод выделенного слова или фразы прямо на странице.
-• Работает сразу после установки, без регистрации, ключей и оплаты: слова отбирает
-  встроенный список уровней, переводят бесплатные словарные сервисы.
-• Хотите точнее — подключите языковую модель: локальную на своём компьютере или
-  облачную по своему ключу. Она видит контекст, находит фразы и объясняет их.
-• Работает только на сайтах, которые вы разрешили сами, на остальных не запускается.
+Без регистрации и ключей
+Работает сразу после установки: слова отбирает встроенный список уровней, переводят
+бесплатные словарные сервисы. Хотите точнее — подключите языковую модель: локальную
+на своём компьютере или облачную по своему ключу. Она видит контекст, находит фразы
+и объясняет их.
+
+Языки
+Читать можно на английском и других языках, переводить на свой. Интерфейс на русском,
+английском, испанском, португальском, китайском и корейском. Уровни слов без модели
+определяются для английского.
 
 Приватность: у расширения нет сервера, аналитики и аккаунтов, разработчик ничего
 не получает. Слова со страницы уходят только словарным сервисам из настроек (из
 коробки — двум бесплатным) и модели, если вы её подключили. Ключи сервисов хранятся
 в настройках браузера и отправляются только тому сервису, которому принадлежат.
+Работает только на сайтах, которые вы разрешили сами.
 
 Открытый исходный код: https://github.com/Hakoba/erudit
 Как настроить: https://github.com/Hakoba/erudit/blob/master/docs/SETUP.md
 Вопросы и поддержка: https://t.me/erudit_extension
+
+## Summary — English (localized listing, ≤ 132 chars)
+
+Learn vocabulary while reading: unknown words highlighted, hover translation, a personal
+dictionary and spaced repetition.
+
+## Description — English
+
+Erudit helps you learn foreign-language vocabulary from the texts you already read:
+articles, forums, online books. On the sites you allow, it highlights unknown words
+above your level, shows a translation on hover and keeps the words in a personal
+dictionary with spaced repetition. The page is never translated as a whole: you read
+the original, and help comes only for the hard parts.
+
+How it works
+• Hard words highlighted right in the text, tuned to your level A1–C2.
+• Translation of a word or phrase on hover and on selection.
+• Personal dictionary: the word, its translation, the sentence it came from and the page.
+• Practice at intervals of 1, 3, 7, 16, 35 and 90 days.
+• Review in context: on pages in your own language, saved words are woven into the
+  text so you recall them as you read.
+• Statistics: words by level, where they came from, pages read.
+• Dictionary export to Anki.
+
+No sign-up, no keys
+Works right after installing: a built-in level list picks the words, free dictionary
+services translate them. For better results, connect a language model — a local one
+on your computer or a cloud one with your own key. It sees the context, catches
+phrases and explains them.
+
+Languages
+Read in English and other languages, translate into yours. The interface is available
+in English, Russian, Spanish, Portuguese, Chinese and Korean. Word levels without a
+model are determined for English.
+
+Privacy: the extension has no server, no analytics and no accounts; the developer
+receives nothing. Words from the page go only to the dictionary services in your
+settings (two free ones out of the box) and to a model if you connected one. Service
+keys are kept in your browser settings and sent only to the service they belong to.
+It runs only on the sites you allowed yourself.
+
+Source code: https://github.com/Hakoba/erudit
+Setup guide: https://github.com/Hakoba/erudit/blob/master/docs/SETUP.md
+Questions and support: https://t.me/erudit_extension
 
 ## Категория
 
