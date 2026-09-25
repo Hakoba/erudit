@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { BookMarked, Eraser, PanelRightClose, RefreshCw, Replace, Settings, SquareDashedMousePointer, X } from 'lucide-vue-next'
-import Badge from 'primevue/badge'
 import Button from 'primevue/button'
 import { useI18n } from 'vue-i18n'
 import AppLogo from '@/components/AppLogo.vue'
@@ -49,12 +48,13 @@ const emit = defineEmits<{
       </strong>
     </template>
 
-    <Badge
+    <span
       v-if="!isLoading && wordsCount"
-      :value="String(wordsCount)"
-      severity="info"
+      class="rounded bg-brand px-1.5 py-0.5 text-xs font-semibold text-[var(--p-primary-contrast-color)]"
       :aria-label="t('overlay.wordsFound')"
-    />
+    >
+      {{ wordsCount }}
+    </span>
 
     <Button
       v-if="isStarted && !isLoading"
@@ -100,7 +100,7 @@ const emit = defineEmits<{
       severity="secondary"
       size="small"
       :aria-label="t('overlay.resetArea')"
-      v-bind="hintAttrs(t('overlay.resetAreaHint'))"
+      v-bind="hintAttrs(t('overlay.resetArea'))"
       @click="emit('resetArea')"
     >
       <Eraser :size="16" />
@@ -112,7 +112,7 @@ const emit = defineEmits<{
       :severity="isPicking ? 'primary' : 'secondary'"
       size="small"
       :aria-label="t(isPicking ? 'overlay.pickAreaCancel' : 'overlay.pickArea')"
-      v-bind="hintAttrs(t(isPicking ? 'overlay.pickAreaCancelHint' : 'overlay.pickAreaHint'))"
+      v-bind="hintAttrs(t(isPicking ? 'overlay.pickAreaCancel' : 'overlay.pickArea'))"
       @click="emit('pickArea')"
     >
       <SquareDashedMousePointer :size="16" />
@@ -137,7 +137,7 @@ const emit = defineEmits<{
       severity="secondary"
       size="small"
       :aria-label="t('overlay.collapse')"
-      v-bind="hintAttrs(t('overlay.collapseHint'))"
+      v-bind="hintAttrs(t('overlay.collapse'))"
       @click="emit('collapse')"
     >
       <PanelRightClose :size="16" />

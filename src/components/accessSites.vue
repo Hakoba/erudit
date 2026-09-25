@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Plus, ShieldAlert, ShieldOff, Trash2 } from 'lucide-vue-next'
+import { Plus, ShieldOff, Trash2 } from 'lucide-vue-next'
 import InlineSvg from '@/components/InlineSvg.vue'
 import sitesEmptyArt from '@/assets/illustrations/sites-empty.svg?raw'
 import { useAccessSites } from '@/composables/useAccessSites'
 import { useHostAccess } from '@/composables/useHostAccess'
-import type { AccessMode } from '@/composables/matchesSite'
+import { isValidUrl, type AccessMode } from '@/composables/matchesSite'
 
 /**
  * Список сайтов вместе с режимом: режим задаёт, что этот список значит, и порознь
@@ -48,7 +48,7 @@ async function handleAddSite(): Promise<void> {
   }
 
   if (!addSite(url)) {
-    errorMessage.value = t('sites.errorInvalid')
+    errorMessage.value = t(isValidUrl(url) ? 'sites.errorDuplicate' : 'sites.errorInvalid')
     return
   }
 
@@ -99,11 +99,7 @@ async function handleMode(mode: AccessMode): Promise<void> {
           severity="warn"
           :label="t('sites.grantAccess')"
           @click="requestAllAccess"
-        >
-          <template #icon>
-            <ShieldAlert :size="14" />
-          </template>
-        </Button>
+        />
       </span>
     </Message>
 
@@ -131,12 +127,12 @@ async function handleMode(mode: AccessMode): Promise<void> {
       <template v-if="options.guarded">
         <ul
           v-if="trusted.length"
-          class="m-0 mt-2 flex list-none flex-col gap-2 p-0"
+          class="m-0 mt-2 flex list-none flex-col divide-y divide-line p-0"
         >
           <li
             v-for="url in trusted"
             :key="url"
-            class="flex items-center gap-3 rounded-md border border-line px-3 py-2"
+            class="flex items-center gap-3 py-2"
           >
             <ShieldOff
               :size="16"
@@ -147,7 +143,7 @@ async function handleMode(mode: AccessMode): Promise<void> {
               severity="secondary"
               text
               rounded
-              class="hover:!text-red-500"
+              class="hover:!text-[var(--p-red-500)]"
               :aria-label="t('sites.guardRestore', { url })"
               @click="untrustSite(url)"
             >
@@ -161,20 +157,25 @@ async function handleMode(mode: AccessMode): Promise<void> {
       </template>
     </div>
 
-    <div class="flex gap-2 pt-1">
-      <InputText
-        v-model="newSiteUrl"
-        placeholder="https://www.reddit.com/"
-        class="flex-1"
-        :aria-label="t('sites.address')"
-        @keyup.enter="handleAddSite"
-      />
-      <Button
-        :aria-label="t('sites.add')"
-        @click="handleAddSite"
-      >
-        <Plus :size="16" />
-      </Button>
+    <div class="flex flex-col gap-2 pt-1">
+      <div class="flex gap-2">
+        <InputText
+          v-model="newSiteUrl"
+          placeholder="https://www.reddit.com/"
+          class="flex-1"
+          :aria-label="t('sites.address')"
+          @keyup.enter="handleAddSite"
+        />
+        <Button
+          :aria-label="t('sites.add')"
+          @click="handleAddSite"
+        >
+          <Plus :size="16" />
+        </Button>
+      </div>
+      <small class="text-muted">
+        {{ t(isDenyMode ? 'sites.hintDeny' : 'sites.hintAllow') }}
+      </small>
     </div>
 
     <Message
@@ -186,18 +187,14 @@ async function handleMode(mode: AccessMode): Promise<void> {
       {{ errorMessage }}
     </Message>
 
-    <small class="text-muted">
-      {{ t(isDenyMode ? 'sites.hintDeny' : 'sites.hintAllow') }}
-    </small>
-
     <ul
       v-if="sites.length"
-      class="flex flex-col gap-2 m-0 p-0 list-none"
+      class="m-0 flex list-none flex-col divide-y divide-line p-0"
     >
       <li
         v-for="site in sites"
         :key="site.url"
-        class="flex items-center gap-3 rounded-md border border-line px-3 py-2"
+        class="flex items-center gap-3 py-2"
       >
         <ToggleSwitch
           :model-value="site.enabled"
@@ -219,16 +216,12 @@ async function handleMode(mode: AccessMode): Promise<void> {
           :label="t('sites.grantAccess')"
           :title="t('sites.accessMissing')"
           @click="requestAccess([site.url])"
-        >
-          <template #icon>
-            <ShieldAlert :size="14" />
-          </template>
-        </Button>
+        />
         <Button
           severity="secondary"
           text
           rounded
-          class="hover:!text-red-500"
+          class="hover:!text-[var(--p-red-500)]"
           :aria-label="t('sites.remove', { url: site.url })"
           @click="removeSite(site.url)"
         >

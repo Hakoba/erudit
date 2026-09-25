@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import SectionPanel from '@/components/SectionPanel.vue'
 import { computed } from 'vue'
-import { Bot, GraduationCap, Languages, MessageSquareText, Monitor, MousePointerClick, ScanText } from 'lucide-vue-next'
+import FormField from '@/components/FormField.vue'
 import InlineSvg from '@/components/InlineSvg.vue'
 import readingArt from '@/assets/illustrations/reading.svg?raw'
 import { PROMPT_EXTRA_LIMIT, SELECTION_MODES, WORD_ENGINES, useReaderSettings } from '@/composables/useReaderSettings'
@@ -27,146 +28,93 @@ const isProfileUseless = computed<boolean>(
 </script>
 
 <template>
-  <Card>
-    <template #title>
-      <span class="flex items-center gap-2">
-        <Languages :size="20" />
-        {{ t('settings.language.title') }}
-      </span>
-    </template>
-    <template #subtitle>
-      {{ t('settings.language.subtitle') }}
-    </template>
-    <template #content>
-      <div class="flex flex-col gap-4 pt-2">
-        <div class="grid gap-4 sm:grid-cols-2">
-          <div class="flex flex-col gap-2">
-            <label
-              for="ui-lang"
-              class="flex items-center gap-2 text-muted"
-            >
-              <Monitor :size="14" />
-              {{ t('settings.language.ui') }}
-            </label>
-            <Select
-              id="ui-lang"
-              v-model="settings.uiLang"
-              :options="UI_LANGUAGES"
-              option-label="native"
-              option-value="code"
-              class="w-full"
-            />
-          </div>
+  <div class="flex max-w-3xl flex-col gap-6">
+    <h2 class="m-0 text-2xl font-semibold">
+      {{ t('nav.reading') }}
+    </h2>
 
-          <div class="flex flex-col gap-2">
-            <label
-              for="reader-level"
-              class="flex items-center gap-2 text-muted"
-            >
-              <GraduationCap :size="14" />
-              {{ t('settings.language.level') }}
-            </label>
-            <Select
-              id="reader-level"
-              v-model="settings.level"
-              :options="[...CEFR_LEVELS]"
-              class="w-full"
-            />
-          </div>
-
-          <div class="flex flex-col gap-2">
-            <label
-              for="source-lang"
-              class="text-muted"
-            >
-              {{ t('settings.language.source') }}
-            </label>
-            <Select
-              id="source-lang"
-              v-model="settings.sourceLang"
-              :options="LANGUAGES"
-              option-label="native"
-              option-value="code"
-              class="w-full"
-            />
-          </div>
-
-          <div class="flex flex-col gap-2">
-            <label
-              for="target-lang"
-              class="text-muted"
-            >
-              {{ t('settings.language.target') }}
-            </label>
-            <Select
-              id="target-lang"
-              v-model="settings.targetLang"
-              :options="LANGUAGES"
-              option-label="native"
-              option-value="code"
-              class="w-full"
-            />
-          </div>
-        </div>
-
-        <!-- картинка объясняет главное в этой подсказке: уровень — это порог,
-             и разбирается всё, что выше него -->
-        <div class="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-line bg-surface-hover p-4">
-          <InlineSvg
-            :markup="readingArt"
-            class="w-28 text-content"
-          />
-          <small class="min-w-56 flex-1 text-muted">
-            {{ t('settings.language.hint') }}
-          </small>
-        </div>
-      </div>
-    </template>
-  </Card>
-
-  <Card>
-    <template #title>
-      <span class="flex items-center gap-2">
-        <ScanText :size="20" />
-        {{ t('settings.analyze.title') }}
-      </span>
-    </template>
-    <template #subtitle>
-      {{ t('settings.analyze.subtitle') }}
-    </template>
-    <template #content>
-      <div class="flex flex-col gap-4 pt-2">
-        <div class="flex flex-col gap-2">
-          <label
-            for="word-engine"
-            class="flex items-center gap-2 text-muted"
-          >
-            <Bot :size="14" />
-            {{ t('settings.analyze.engine') }}
-          </label>
+    <SectionPanel :title="t('settings.language.title')">
+      <div class="grid gap-5 sm:grid-cols-3">
+        <FormField
+          :label="t('settings.language.level')"
+          input-id="reader-level"
+        >
           <Select
-            id="word-engine"
-            v-model="settings.engine"
-            :options="engineOptions"
-            option-label="label"
-            option-value="value"
-            class="w-full sm:w-80"
+            id="reader-level"
+            v-model="settings.level"
+            :options="[...CEFR_LEVELS]"
+            class="w-full"
           />
-          <small class="text-muted">
-            {{ t(`settings.analyze.engineHints.${settings.engine}`) }}
-          </small>
+        </FormField>
 
-          <Message
-            v-if="isProfileUseless"
-            severity="warn"
-            size="small"
-            variant="simple"
-          >
-            {{ t('settings.analyze.engineOnlyEnglish') }}
-          </Message>
-        </div>
+        <FormField
+          :label="t('settings.language.source')"
+          input-id="source-lang"
+        >
+          <Select
+            id="source-lang"
+            v-model="settings.sourceLang"
+            :options="LANGUAGES"
+            option-label="native"
+            option-value="code"
+            class="w-full"
+          />
+        </FormField>
 
-        <div class="flex items-center gap-2 border-t border-line pt-4">
+        <FormField
+          :label="t('settings.language.target')"
+          input-id="target-lang"
+        >
+          <Select
+            id="target-lang"
+            v-model="settings.targetLang"
+            :options="LANGUAGES"
+            option-label="native"
+            option-value="code"
+            class="w-full"
+          />
+        </FormField>
+      </div>
+
+      <!-- картинка объясняет главное: уровень — это порог, разбирается всё, что выше -->
+      <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+        <InlineSvg
+          :markup="readingArt"
+          class="w-28 text-content"
+        />
+        <small class="min-w-56 flex-1 text-muted">
+          {{ t('settings.language.hint') }}
+        </small>
+      </div>
+    </SectionPanel>
+
+    <SectionPanel :title="t('settings.analyze.title')">
+      <FormField
+        :label="t('settings.analyze.engine')"
+        input-id="word-engine"
+        :hint="t(`settings.analyze.engineHints.${settings.engine}`)"
+      >
+        <Select
+          id="word-engine"
+          v-model="settings.engine"
+          :options="engineOptions"
+          option-label="label"
+          option-value="value"
+          class="w-full sm:w-80"
+        />
+      </FormField>
+
+      <Message
+        v-if="isProfileUseless"
+        severity="warn"
+        size="small"
+        variant="simple"
+      >
+        {{ t('settings.analyze.engineOnlyEnglish') }}
+      </Message>
+
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
           <ToggleSwitch
             v-model="settings.autoAnalyze"
             input-id="auto-analyze"
@@ -175,68 +123,76 @@ const isProfileUseless = computed<boolean>(
             {{ t('settings.analyze.autoAnalyze') }}
           </label>
         </div>
-        <small class="-mt-2 text-muted">
+        <small class="text-muted">
           {{ t('settings.analyze.autoAnalyzeHint') }}
         </small>
-
-        <div class="flex flex-col gap-2 border-t border-line pt-4">
-          <label
-            for="selection-mode"
-            class="flex items-center gap-2 text-muted"
-          >
-            <MousePointerClick :size="14" />
-            {{ t('settings.analyze.selectionMode') }}
-          </label>
-          <Select
-            id="selection-mode"
-            v-model="settings.selectionMode"
-            :options="selectionOptions"
-            option-label="label"
-            option-value="value"
-            class="w-full sm:w-80"
-          />
-          <small class="text-muted">
-            {{ t(`settings.analyze.selectionHints.${settings.selectionMode}`) }}
-          </small>
-        </div>
-
-        <!-- только при модели: без неё фразы и так переводит переводчик -->
-        <template v-if="settings.engine === 'llm' && settings.selectionMode !== 'off'">
-          <div class="flex items-center gap-2 border-t border-line pt-4">
-            <ToggleSwitch
-              v-model="settings.llmPhrases"
-              input-id="llm-phrases"
-            />
-            <label for="llm-phrases">
-              {{ t('settings.analyze.llmPhrases') }}
-            </label>
-          </div>
-          <small class="-mt-2 text-muted">
-            {{ t('settings.analyze.llmPhrasesHint') }}
-          </small>
-        </template>
-
-        <div class="flex flex-col gap-2 border-t border-line pt-4">
-          <label
-            for="prompt-extra"
-            class="flex items-center gap-2 text-muted"
-          >
-            <MessageSquareText :size="14" />
-            {{ t('settings.analyze.promptExtra') }}
-          </label>
-          <Textarea
-            id="prompt-extra"
-            v-model="settings.promptExtra"
-            rows="3"
-            auto-resize
-            :maxlength="PROMPT_EXTRA_LIMIT"
-            :placeholder="t('settings.analyze.promptExtraPlaceholder')"
-          />
-          <small class="text-muted">
-            {{ t('settings.analyze.promptExtraHint', { left: PROMPT_EXTRA_LIMIT - settings.promptExtra.length }) }}
-          </small>
-        </div>
       </div>
-    </template>
-  </Card>
+
+      <FormField
+        :label="t('settings.analyze.selectionMode')"
+        input-id="selection-mode"
+        :hint="t(`settings.analyze.selectionHints.${settings.selectionMode}`)"
+      >
+        <Select
+          id="selection-mode"
+          v-model="settings.selectionMode"
+          :options="selectionOptions"
+          option-label="label"
+          option-value="value"
+          class="w-full sm:w-96"
+        />
+      </FormField>
+
+      <!-- только при модели: без неё фразы и так переводит переводчик -->
+      <div
+        v-if="settings.engine === 'llm' && settings.selectionMode !== 'off'"
+        class="flex flex-col gap-2"
+      >
+        <div class="flex items-center gap-2">
+          <ToggleSwitch
+            v-model="settings.llmPhrases"
+            input-id="llm-phrases"
+          />
+          <label for="llm-phrases">
+            {{ t('settings.analyze.llmPhrases') }}
+          </label>
+        </div>
+        <small class="text-muted">
+          {{ t('settings.analyze.llmPhrasesHint') }}
+        </small>
+      </div>
+
+      <FormField
+        :label="t('settings.analyze.promptExtra')"
+        input-id="prompt-extra"
+        :hint="t('settings.analyze.promptExtraHint', { left: PROMPT_EXTRA_LIMIT - settings.promptExtra.length })"
+      >
+        <Textarea
+          id="prompt-extra"
+          v-model="settings.promptExtra"
+          rows="3"
+          auto-resize
+          :maxlength="PROMPT_EXTRA_LIMIT"
+          :placeholder="t('settings.analyze.promptExtraPlaceholder')"
+        />
+      </FormField>
+    </SectionPanel>
+
+    <!-- язык интерфейса — не про чтение, поэтому отдельно и последним -->
+    <SectionPanel :title="t('settings.interface.title')">
+      <FormField
+        :label="t('settings.language.ui')"
+        input-id="ui-lang"
+      >
+        <Select
+          id="ui-lang"
+          v-model="settings.uiLang"
+          :options="UI_LANGUAGES"
+          option-label="native"
+          option-value="code"
+          class="w-full sm:w-80"
+        />
+      </FormField>
+    </SectionPanel>
+  </div>
 </template>

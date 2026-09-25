@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { BookMarked, BookOpenText, Bot, CircleQuestionMark, DatabaseBackup, Dumbbell, Github, Globe, Library, Replace, Settings } from 'lucide-vue-next'
+import { BookMarked, ChartColumn, CircleQuestionMark, DatabaseBackup, Dumbbell, Github, Replace, Settings } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import AppLogo from '@/components/AppLogo.vue'
 import ThemeSwitch from '@/components/ThemeSwitch.vue'
@@ -66,7 +66,6 @@ const modelNeedsKey = computed<boolean>(() =>
           :class="SUB_LINK_CLASS"
           :exact-active-class="ACTIVE_LINK_CLASS"
         >
-          <BookOpenText :size="16" />
           {{ t('nav.reading') }}
         </RouterLink>
         <RouterLink
@@ -74,12 +73,11 @@ const modelNeedsKey = computed<boolean>(() =>
           :class="SUB_LINK_CLASS"
           :exact-active-class="ACTIVE_LINK_CLASS"
         >
-          <Bot :size="16" />
           {{ t('nav.model') }}
           <!-- без ключа облачная модель молчит, а узнать об этом иначе можно только при разборе -->
           <span
             v-if="modelNeedsKey"
-            class="ml-auto size-2 rounded-full bg-orange-400"
+            class="ml-auto size-2 rounded-full bg-mark-new"
             :title="t('nav.modelNeedsKey')"
           />
         </RouterLink>
@@ -88,7 +86,6 @@ const modelNeedsKey = computed<boolean>(() =>
           :class="SUB_LINK_CLASS"
           :exact-active-class="ACTIVE_LINK_CLASS"
         >
-          <Library :size="16" />
           {{ t('nav.dictionaries') }}
         </RouterLink>
         <RouterLink
@@ -96,7 +93,6 @@ const modelNeedsKey = computed<boolean>(() =>
           :class="SUB_LINK_CLASS"
           :exact-active-class="ACTIVE_LINK_CLASS"
         >
-          <Globe :size="16" />
           {{ t('nav.sites') }}
         </RouterLink>
 
@@ -115,6 +111,14 @@ const modelNeedsKey = computed<boolean>(() =>
         >
           <Dumbbell :size="18" />
           {{ t('nav.training') }}
+        </RouterLink>
+        <RouterLink
+          to="/options-page/statistics"
+          :class="LINK_CLASS"
+          :exact-active-class="ACTIVE_LINK_CLASS"
+        >
+          <ChartColumn :size="18" />
+          {{ t('nav.statistics') }}
         </RouterLink>
         <RouterLink
           to="/options-page/immersion"

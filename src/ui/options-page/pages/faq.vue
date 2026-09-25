@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { ChevronDown, CircleQuestionMark, ExternalLink, MessageCircle } from 'lucide-vue-next'
+import SectionPanel from '@/components/SectionPanel.vue'
+import { ChevronDown } from 'lucide-vue-next'
 import InlineSvg from '@/components/InlineSvg.vue'
 import faqArt from '@/assets/illustrations/faq.svg?raw'
 
 /**
  * Справка внутри расширения: короткие ответы на то, обо что спотыкаются на практике.
  * Исчерпывающая версия живёт в репозитории — держать её в шести локалях незачем,
- * поэтому внизу ссылка.
+ * поэтому рядом ссылка.
  *
  * Раскрытие — на нативном `details`: доступность и клавиатура достаются даром,
  * состояние хранить не нужно.
@@ -26,119 +27,71 @@ const GROUPS: { label: string; items: string[] }[] = [
   { label: 'dictionary', items: ['repeat', 'sync', 'anki'] },
   { label: 'privacy', items: ['local', 'data'] },
 ]
+
+const LINKS: { key: string; href: string }[] = [
+  { key: 'faq.setupGuide', href: SETUP_DOC_URL },
+  { key: 'faq.full', href: FAQ_DOC_URL },
+  { key: 'faq.support', href: SUPPORT_URL },
+]
 </script>
 
 <template>
-  <Card>
-    <template #title>
-      <span class="flex items-center gap-2">
-        <CircleQuestionMark :size="20" />
-        {{ t('faq.title') }}
-      </span>
-    </template>
-    <template #content>
-      <div class="flex max-w-3xl flex-col gap-8 pt-2">
-        <!-- картинка показывает то же, что список ниже: раскрытый вопрос и свёрнутый.
-             Ссылка на полный FAQ стоит здесь, а не в конце: до конца ещё долистать -->
-        <div class="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-xl border border-line bg-surface-hover p-5">
-          <InlineSvg
-            :markup="faqArt"
-            class="w-32 text-content"
-          />
+  <div class="flex max-w-3xl flex-col gap-6">
+    <h2 class="m-0 text-2xl font-semibold">
+      {{ t('faq.title') }}
+    </h2>
 
-          <div class="flex min-w-56 flex-1 flex-col items-start gap-3">
-            <p class="m-0 text-muted">
-              {{ t('faq.subtitle') }}
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <a
-                :href="SETUP_DOC_URL"
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <Button
-                  size="small"
-                  :label="t('faq.setupGuide')"
-                >
-                  <template #icon>
-                    <ExternalLink :size="16" />
-                  </template>
-                </Button>
-              </a>
-              <a
-                :href="FAQ_DOC_URL"
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <Button
-                  severity="secondary"
-                  outlined
-                  size="small"
-                  :label="t('faq.full')"
-                >
-                  <template #icon>
-                    <ExternalLink :size="16" />
-                  </template>
-                </Button>
-              </a>
-              <a
-                :href="SUPPORT_URL"
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <Button
-                  severity="secondary"
-                  text
-                  size="small"
-                  :label="t('faq.support')"
-                >
-                  <template #icon>
-                    <MessageCircle :size="16" />
-                  </template>
-                </Button>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <section
-          v-for="group in GROUPS"
-          :key="group.label"
-          class="flex flex-col gap-2"
+    <!-- ссылки наверху, а не в конце: до конца ещё долистать -->
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-4">
+      <InlineSvg
+        :markup="faqArt"
+        class="w-28 text-content"
+      />
+      <ul class="m-0 flex list-none flex-col gap-2 p-0">
+        <li
+          v-for="link in LINKS"
+          :key="link.key"
         >
-          <!-- разрядка и размер вместо жирного: подпись группы не должна спорить с вопросами -->
-          <h2 class="m-0 text-xs font-semibold uppercase tracking-[0.14em] text-muted">
-            {{ t(`faq.group.${group.label}`) }}
-          </h2>
-
-          <details
-            v-for="(item, index) in group.items"
-            :key="item"
-            class="group rounded-lg border border-line bg-surface-hover px-4
-                   [&[open]]:bg-surface"
+          <a
+            :href="link.href"
+            target="_blank"
+            rel="noreferrer noopener"
+            class="text-content underline decoration-line underline-offset-4 hover:decoration-current"
           >
-            <summary
-              class="flex cursor-pointer list-none items-center gap-3 py-3 font-medium
-                     [&::-webkit-details-marker]:hidden"
-            >
-              <!-- нумерация моноширинным: та же деталь, что на сайте расширения -->
-              <span class="font-mono text-xs text-muted">
-                {{ String(index + 1).padStart(2, '0') }}
-              </span>
-              <span class="flex-1">{{ t(`faq.${item}Q`) }}</span>
-              <ChevronDown
-                :size="16"
-                class="shrink-0 text-muted transition-transform group-open:rotate-180"
-              />
-            </summary>
+            {{ t(link.key) }}
+          </a>
+        </li>
+      </ul>
+    </div>
 
-            <!-- левая линия ведёт от вопроса к ответу и отделяет его от следующего -->
-            <p class="m-0 border-l-2 border-mark-new pb-4 pl-4 text-muted">
-              {{ t(`faq.${item}A`) }}
-            </p>
-          </details>
-        </section>
+    <SectionPanel
+      v-for="group in GROUPS"
+      :key="group.label"
+      :title="t(`faq.group.${group.label}`)"
+      class="gap-1"
+    >
+      <div class="divide-y divide-line">
+        <details
+          v-for="item in group.items"
+          :key="item"
+          class="group"
+        >
+          <summary
+            class="flex cursor-pointer list-none items-center gap-3 py-3
+                   [&::-webkit-details-marker]:hidden"
+          >
+            <span class="flex-1">{{ t(`faq.${item}Q`) }}</span>
+            <ChevronDown
+              :size="16"
+              class="shrink-0 text-muted transition-transform group-open:rotate-180"
+            />
+          </summary>
+
+          <p class="m-0 pb-4 text-muted">
+            {{ t(`faq.${item}A`) }}
+          </p>
+        </details>
       </div>
-    </template>
-  </Card>
+    </SectionPanel>
+  </div>
 </template>

@@ -51,11 +51,16 @@ declare global {
   const PROVIDERS: typeof import('../utils/llm/providers').PROVIDERS
   const PROVIDER_LIST: typeof import('../utils/llm/providers').PROVIDER_LIST
   const RAIL_WIDTH: typeof import('../composables/useOverlayDock').RAIL_WIDTH
+  const READING_LOG_EVENT: typeof import('../utils/readingLog').READING_LOG_EVENT
+  const READING_LOG_KEY: typeof import('../utils/readingLog').READING_LOG_KEY
+  const READING_LOG_RETENTION_DAYS: typeof import('../utils/readingLog').READING_LOG_RETENTION_DAYS
   const REQUEST_TIMEOUT_MS: typeof import('../utils/llmClient').REQUEST_TIMEOUT_MS
   const SCRIPTS_SYNC: typeof import('../utils/siteScripts').SCRIPTS_SYNC
   const SELECTION_MODES: typeof import('../composables/useReaderSettings').SELECTION_MODES
   const SESSION_SIZE: typeof import('../utils/srs').SESSION_SIZE
   const SITE_RULES: typeof import('../utils/extract/rules').SITE_RULES
+  const STATS_WEEKS: typeof import('../utils/stats').STATS_WEEKS
+  const TOP_SITES: typeof import('../utils/stats').TOP_SITES
   const TRANSLATE_ATTR: typeof import('../utils/highlight').TRANSLATE_ATTR
   const TRANSLATORS: typeof import('../utils/mt/translators').TRANSLATORS
   const TRANSLATOR_LIST: typeof import('../utils/mt/translators').TRANSLATOR_LIST
@@ -161,6 +166,7 @@ declare global {
   const highlightTerms: typeof import('../utils/highlight').highlightTerms
   const hintAttrs: typeof import('../utils/hint').hintAttrs
   const hostFilterOptions: typeof import('../utils/dictionary').hostFilterOptions
+  const hostOf: typeof import('../utils/url').hostOf
   const hostsOf: typeof import('../composables/useHostAccess').hostsOf
   const i18n: typeof import('../utils/i18n').i18n
   const ignorableWatch: typeof import('@vueuse/core').ignorableWatch
@@ -176,6 +182,7 @@ declare global {
   const isPanelState: typeof import('../utils/panelBus').isPanelState
   const isProxy: typeof import('vue').isProxy
   const isReactive: typeof import('vue').isReactive
+  const isReadingEvent: typeof import('../utils/readingLog').isReadingEvent
   const isReadonly: typeof import('vue').isReadonly
   const isRecord: typeof import('../utils/panelBus').isRecord
   const isRef: typeof import('vue').isRef
@@ -188,6 +195,7 @@ declare global {
   const isValidUrl: typeof import('../composables/matchesSite').isValidUrl
   const joinBlocks: typeof import('../utils/extract/blocks').joinBlocks
   const languageName: typeof import('../utils/languages').languageName
+  const levelCounts: typeof import('../utils/stats').levelCounts
   const levelFilterOptions: typeof import('../utils/dictionary').levelFilterOptions
   const limitChars: typeof import('../utils/extract/blocks').limitChars
   const lookupFreeDictionary: typeof import('../utils/dictClient').lookupFreeDictionary
@@ -241,6 +249,7 @@ declare global {
   const openOptionsTab: typeof import('../utils/dictionaryTab').openOptionsTab
   const optionsSectionUrl: typeof import('../utils/dictionaryTab').optionsSectionUrl
   const originPattern: typeof import('../composables/matchesSite').originPattern
+  const pageKey: typeof import('../utils/readingLog').pageKey
   const pageSource: typeof import('../utils/dictionary').pageSource
   const panelStateFromMessage: typeof import('../utils/panelBus').panelStateFromMessage
   const parseApkg: typeof import('../utils/anki').parseApkg
@@ -260,6 +269,7 @@ declare global {
   const promise: typeof import('../composables/useReaderSettings').promise
   const provide: typeof import('vue').provide
   const provideLocal: typeof import('@vueuse/core').provideLocal
+  const pruneReadingLog: typeof import('../utils/readingLog').pruneReadingLog
   const queryEntries: typeof import('../utils/dictionary').queryEntries
   const reactify: typeof import('@vueuse/core').reactify
   const reactifyObject: typeof import('@vueuse/core').reactifyObject
@@ -267,7 +277,9 @@ declare global {
   const reactiveComputed: typeof import('@vueuse/core').reactiveComputed
   const reactiveOmit: typeof import('@vueuse/core').reactiveOmit
   const reactivePick: typeof import('@vueuse/core').reactivePick
+  const readingHost: typeof import('../utils/readingLog').readingHost
   const readonly: typeof import('vue').readonly
+  const recordReading: typeof import('../utils/readingLog').recordReading
   const ref: typeof import('vue').ref
   const refAutoReset: typeof import('@vueuse/core').refAutoReset
   const refDebounced: typeof import('@vueuse/core').refDebounced
@@ -301,6 +313,7 @@ declare global {
   const shallowRef: typeof import('vue').shallowRef
   const sourceHost: typeof import('../utils/dictionary').sourceHost
   const splitItem: typeof import('../utils/changelog').splitItem
+  const startOfDay: typeof import('../utils/readingLog').startOfDay
   const storeToRefs: typeof import('pinia').storeToRefs
   const stripHtml: typeof import('../utils/anki').stripHtml
   const syncRef: typeof import('@vueuse/core').syncRef
@@ -316,6 +329,7 @@ declare global {
   const toRef: typeof import('vue').toRef
   const toRefs: typeof import('vue').toRefs
   const toValue: typeof import('vue').toValue
+  const topByCount: typeof import('../utils/stats').topByCount
   const translateTerm: typeof import('../utils/translateTerm').translateTerm
   const triggerRef: typeof import('vue').triggerRef
   const tryOnBeforeMount: typeof import('@vueuse/core').tryOnBeforeMount
@@ -458,6 +472,7 @@ declare global {
   const usePrevious: typeof import('@vueuse/core').usePrevious
   const useRafFn: typeof import('@vueuse/core').useRafFn
   const useReaderSettings: typeof import('../composables/useReaderSettings').useReaderSettings
+  const useReadingLog: typeof import('../composables/useReadingLog').useReadingLog
   const useRefHistory: typeof import('@vueuse/core').useRefHistory
   const useResizeObserver: typeof import('@vueuse/core').useResizeObserver
   const useRoute: typeof import('vue-router').useRoute
@@ -528,6 +543,8 @@ declare global {
   const watchThrottled: typeof import('@vueuse/core').watchThrottled
   const watchTriggerable: typeof import('@vueuse/core').watchTriggerable
   const watchWithFilter: typeof import('@vueuse/core').watchWithFilter
+  const weekStart: typeof import('../utils/stats').weekStart
+  const weeklyCounts: typeof import('../utils/stats').weeklyCounts
   const whenever: typeof import('@vueuse/core').whenever
   const yandexModelUri: typeof import('../composables/useLlmSettings').yandexModelUri
 }
@@ -554,6 +571,9 @@ declare global {
   // @ts-ignore
   export type { NewDictionaryEntry } from '../composables/useDictionary'
   import('../composables/useDictionary')
+  // @ts-ignore
+  export type { AnalysisOutcome } from '../composables/useDifficultWords'
+  import('../composables/useDifficultWords')
   // @ts-ignore
   export type { FillState } from '../composables/useFillTranslations'
   import('../composables/useFillTranslations')
@@ -633,11 +653,17 @@ declare global {
   export type { PanelState, PanelCommand } from '../utils/panelBus'
   import('../utils/panelBus')
   // @ts-ignore
+  export type { ReadingLogEntry, ReadingEvent } from '../utils/readingLog'
+  import('../utils/readingLog')
+  // @ts-ignore
   export type { SettledOutcome } from '../utils/settled'
   import('../utils/settled')
   // @ts-ignore
   export type { ReviewProgress, DictionaryProgress } from '../utils/srs'
   import('../utils/srs')
+  // @ts-ignore
+  export type { RankedShare } from '../utils/stats'
+  import('../utils/stats')
 }
 
 // for vue template auto import
@@ -685,11 +711,16 @@ declare module 'vue' {
     readonly PROVIDERS: UnwrapRef<typeof import('../utils/llm/providers')['PROVIDERS']>
     readonly PROVIDER_LIST: UnwrapRef<typeof import('../utils/llm/providers')['PROVIDER_LIST']>
     readonly RAIL_WIDTH: UnwrapRef<typeof import('../composables/useOverlayDock')['RAIL_WIDTH']>
+    readonly READING_LOG_EVENT: UnwrapRef<typeof import('../utils/readingLog')['READING_LOG_EVENT']>
+    readonly READING_LOG_KEY: UnwrapRef<typeof import('../utils/readingLog')['READING_LOG_KEY']>
+    readonly READING_LOG_RETENTION_DAYS: UnwrapRef<typeof import('../utils/readingLog')['READING_LOG_RETENTION_DAYS']>
     readonly REQUEST_TIMEOUT_MS: UnwrapRef<typeof import('../utils/llmClient')['REQUEST_TIMEOUT_MS']>
     readonly SCRIPTS_SYNC: UnwrapRef<typeof import('../utils/siteScripts')['SCRIPTS_SYNC']>
     readonly SELECTION_MODES: UnwrapRef<typeof import('../composables/useReaderSettings')['SELECTION_MODES']>
     readonly SESSION_SIZE: UnwrapRef<typeof import('../utils/srs')['SESSION_SIZE']>
     readonly SITE_RULES: UnwrapRef<typeof import('../utils/extract/rules')['SITE_RULES']>
+    readonly STATS_WEEKS: UnwrapRef<typeof import('../utils/stats')['STATS_WEEKS']>
+    readonly TOP_SITES: UnwrapRef<typeof import('../utils/stats')['TOP_SITES']>
     readonly TRANSLATORS: UnwrapRef<typeof import('../utils/mt/translators')['TRANSLATORS']>
     readonly TRANSLATOR_LIST: UnwrapRef<typeof import('../utils/mt/translators')['TRANSLATOR_LIST']>
     readonly UI_LANGUAGES: UnwrapRef<typeof import('../utils/languages')['UI_LANGUAGES']>
@@ -793,6 +824,7 @@ declare module 'vue' {
     readonly highlightTerms: UnwrapRef<typeof import('../utils/highlight')['highlightTerms']>
     readonly hintAttrs: UnwrapRef<typeof import('../utils/hint')['hintAttrs']>
     readonly hostFilterOptions: UnwrapRef<typeof import('../utils/dictionary')['hostFilterOptions']>
+    readonly hostOf: UnwrapRef<typeof import('../utils/url')['hostOf']>
     readonly hostsOf: UnwrapRef<typeof import('../composables/useHostAccess')['hostsOf']>
     readonly i18n: UnwrapRef<typeof import('../utils/i18n')['i18n']>
     readonly ignorableWatch: UnwrapRef<typeof import('@vueuse/core')['ignorableWatch']>
@@ -807,6 +839,7 @@ declare module 'vue' {
     readonly isPanelState: UnwrapRef<typeof import('../utils/panelBus')['isPanelState']>
     readonly isProxy: UnwrapRef<typeof import('vue')['isProxy']>
     readonly isReactive: UnwrapRef<typeof import('vue')['isReactive']>
+    readonly isReadingEvent: UnwrapRef<typeof import('../utils/readingLog')['isReadingEvent']>
     readonly isReadonly: UnwrapRef<typeof import('vue')['isReadonly']>
     readonly isRecord: UnwrapRef<typeof import('../utils/panelBus')['isRecord']>
     readonly isRef: UnwrapRef<typeof import('vue')['isRef']>
@@ -819,6 +852,7 @@ declare module 'vue' {
     readonly isValidUrl: UnwrapRef<typeof import('../composables/matchesSite')['isValidUrl']>
     readonly joinBlocks: UnwrapRef<typeof import('../utils/extract/blocks')['joinBlocks']>
     readonly languageName: UnwrapRef<typeof import('../utils/languages')['languageName']>
+    readonly levelCounts: UnwrapRef<typeof import('../utils/stats')['levelCounts']>
     readonly levelFilterOptions: UnwrapRef<typeof import('../utils/dictionary')['levelFilterOptions']>
     readonly limitChars: UnwrapRef<typeof import('../utils/extract/blocks')['limitChars']>
     readonly lookupFreeDictionary: UnwrapRef<typeof import('../utils/dictClient')['lookupFreeDictionary']>
@@ -872,6 +906,7 @@ declare module 'vue' {
     readonly openOptionsTab: UnwrapRef<typeof import('../utils/dictionaryTab')['openOptionsTab']>
     readonly optionsSectionUrl: UnwrapRef<typeof import('../utils/dictionaryTab')['optionsSectionUrl']>
     readonly originPattern: UnwrapRef<typeof import('../composables/matchesSite')['originPattern']>
+    readonly pageKey: UnwrapRef<typeof import('../utils/readingLog')['pageKey']>
     readonly pageSource: UnwrapRef<typeof import('../utils/dictionary')['pageSource']>
     readonly panelStateFromMessage: UnwrapRef<typeof import('../utils/panelBus')['panelStateFromMessage']>
     readonly parseApkg: UnwrapRef<typeof import('../utils/anki')['parseApkg']>
@@ -889,6 +924,7 @@ declare module 'vue' {
     readonly presetForProvider: UnwrapRef<typeof import('../composables/useLlmSettings')['presetForProvider']>
     readonly provide: UnwrapRef<typeof import('vue')['provide']>
     readonly provideLocal: UnwrapRef<typeof import('@vueuse/core')['provideLocal']>
+    readonly pruneReadingLog: UnwrapRef<typeof import('../utils/readingLog')['pruneReadingLog']>
     readonly queryEntries: UnwrapRef<typeof import('../utils/dictionary')['queryEntries']>
     readonly reactify: UnwrapRef<typeof import('@vueuse/core')['reactify']>
     readonly reactifyObject: UnwrapRef<typeof import('@vueuse/core')['reactifyObject']>
@@ -896,7 +932,9 @@ declare module 'vue' {
     readonly reactiveComputed: UnwrapRef<typeof import('@vueuse/core')['reactiveComputed']>
     readonly reactiveOmit: UnwrapRef<typeof import('@vueuse/core')['reactiveOmit']>
     readonly reactivePick: UnwrapRef<typeof import('@vueuse/core')['reactivePick']>
+    readonly readingHost: UnwrapRef<typeof import('../utils/readingLog')['readingHost']>
     readonly readonly: UnwrapRef<typeof import('vue')['readonly']>
+    readonly recordReading: UnwrapRef<typeof import('../utils/readingLog')['recordReading']>
     readonly ref: UnwrapRef<typeof import('vue')['ref']>
     readonly refAutoReset: UnwrapRef<typeof import('@vueuse/core')['refAutoReset']>
     readonly refDebounced: UnwrapRef<typeof import('@vueuse/core')['refDebounced']>
@@ -930,6 +968,7 @@ declare module 'vue' {
     readonly shallowRef: UnwrapRef<typeof import('vue')['shallowRef']>
     readonly sourceHost: UnwrapRef<typeof import('../utils/dictionary')['sourceHost']>
     readonly splitItem: UnwrapRef<typeof import('../utils/changelog')['splitItem']>
+    readonly startOfDay: UnwrapRef<typeof import('../utils/readingLog')['startOfDay']>
     readonly storeToRefs: UnwrapRef<typeof import('pinia')['storeToRefs']>
     readonly stripHtml: UnwrapRef<typeof import('../utils/anki')['stripHtml']>
     readonly syncRef: UnwrapRef<typeof import('@vueuse/core')['syncRef']>
@@ -945,6 +984,7 @@ declare module 'vue' {
     readonly toRef: UnwrapRef<typeof import('vue')['toRef']>
     readonly toRefs: UnwrapRef<typeof import('vue')['toRefs']>
     readonly toValue: UnwrapRef<typeof import('vue')['toValue']>
+    readonly topByCount: UnwrapRef<typeof import('../utils/stats')['topByCount']>
     readonly translateTerm: UnwrapRef<typeof import('../utils/translateTerm')['translateTerm']>
     readonly triggerRef: UnwrapRef<typeof import('vue')['triggerRef']>
     readonly tryOnBeforeMount: UnwrapRef<typeof import('@vueuse/core')['tryOnBeforeMount']>
@@ -1087,6 +1127,7 @@ declare module 'vue' {
     readonly usePrevious: UnwrapRef<typeof import('@vueuse/core')['usePrevious']>
     readonly useRafFn: UnwrapRef<typeof import('@vueuse/core')['useRafFn']>
     readonly useReaderSettings: UnwrapRef<typeof import('../composables/useReaderSettings')['useReaderSettings']>
+    readonly useReadingLog: UnwrapRef<typeof import('../composables/useReadingLog')['useReadingLog']>
     readonly useRefHistory: UnwrapRef<typeof import('@vueuse/core')['useRefHistory']>
     readonly useResizeObserver: UnwrapRef<typeof import('@vueuse/core')['useResizeObserver']>
     readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>
@@ -1157,6 +1198,8 @@ declare module 'vue' {
     readonly watchThrottled: UnwrapRef<typeof import('@vueuse/core')['watchThrottled']>
     readonly watchTriggerable: UnwrapRef<typeof import('@vueuse/core')['watchTriggerable']>
     readonly watchWithFilter: UnwrapRef<typeof import('@vueuse/core')['watchWithFilter']>
+    readonly weekStart: UnwrapRef<typeof import('../utils/stats')['weekStart']>
+    readonly weeklyCounts: UnwrapRef<typeof import('../utils/stats')['weeklyCounts']>
     readonly whenever: UnwrapRef<typeof import('@vueuse/core')['whenever']>
     readonly yandexModelUri: UnwrapRef<typeof import('../composables/useLlmSettings')['yandexModelUri']>
   }

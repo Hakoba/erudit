@@ -17,6 +17,7 @@
   --color-content: var(--p-text-color);
   --color-muted: var(--p-text-muted-color);
   --color-line: var(--p-content-border-color);
+  --color-brand: var(--p-primary-color);
   /*
    * Те же константы, что в assets/base.css: базовые стили сюда не приходят,
    * а `bg-mark-saved` в списке вкраплений без них не собирается вовсе.

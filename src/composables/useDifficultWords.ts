@@ -13,12 +13,15 @@ import { t } from '@/utils/i18n'
  */
 let analyzedText = ''
 
+/** `skipped` — отправлять было нечего или запрос устарел; `failed` — модель или сеть не ответили */
+export type AnalysisOutcome = 'ok' | 'failed' | 'skipped'
+
 export function useDifficultWords(): {
   words: Ref<WordWithExplanation[]>
   sourceText: Ref<string>
   isLoading: Ref<boolean>
   errorMessage: Ref<string>
-  fetchDifficultWords: (full?: boolean, knownText?: string) => Promise<void>
+  fetchDifficultWords: (full?: boolean, knownText?: string) => Promise<AnalysisOutcome>
   cancelFetch: () => void
 } {
   // state
@@ -37,10 +40,10 @@ export function useDifficultWords(): {
    * руками. `knownText` — текст, который вызывающий уже собрал (проверка языка идёт
    * до разбора): второй обход DOM на тяжёлой странице стоит столько же, сколько первый
    */
-  async function fetchDifficultWords(full = false, knownText?: string): Promise<void> {
+  async function fetchDifficultWords(full = false, knownText?: string): Promise<AnalysisOutcome> {
     const request = ++currentRequest
     const pageText = knownText ?? await extractReadableText()
-    if (request !== currentRequest) return
+    if (request !== currentRequest) return 'skipped'
 
     // на странице с догрузкой разбирается только дописанное, иначе разбор упрётся
     // в уже разобранный текст: лимит символов отрезает его с конца
@@ -56,7 +59,7 @@ export function useDifficultWords(): {
       words.value = []
       sourceText.value = ''
       errorMessage.value = t('errors.noText')
-      return
+      return 'skipped'
     }
 
     // Отправлять нечего. Разбор, который этот оверлей уже показал, не трогаем:
@@ -69,7 +72,7 @@ export function useDifficultWords(): {
         errorMessage.value = t('errors.noNewText')
       }
 
-      return
+      return 'skipped'
     }
 
     words.value = []
@@ -81,19 +84,23 @@ export function useDifficultWords(): {
 
     try {
       const result = await analyzeText(parsedText)
-      if (request === currentRequest) {
-        // отказ переводчика слова не отменяет: они найдены офлайн-профилем,
-        // у них есть уровень и подсветка — пропадать им не за что
-        words.value = result.words
-        errorMessage.value = result.error ?? ''
-      }
+      if (request !== currentRequest) return 'skipped'
+
+      // отказ переводчика слова не отменяет: они найдены офлайн-профилем,
+      // у них есть уровень и подсветка — пропадать им не за что
+      words.value = result.words
+      errorMessage.value = result.error ?? ''
+
+      return 'ok'
     } catch (error) {
-      if (request !== currentRequest) return
+      if (request !== currentRequest) return 'skipped'
 
       // без текста ошибки непонятно, модель не отвечает или ответ не распарсился
       errorMessage.value = error instanceof DOMException && error.name === 'AbortError'
         ? t('errors.timeout', { seconds: REQUEST_TIMEOUT_MS / 1000 })
         : error instanceof Error ? error.message : t('errors.llmUnknown')
+
+      return 'failed'
     } finally {
       if (request === currentRequest) isLoading.value = false
     }

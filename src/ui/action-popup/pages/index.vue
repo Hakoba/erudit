@@ -1,18 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {
-  Ban,
-  BookMarked,
-  Check,
-  PanelRight,
-  Plus,
-  RotateCcw,
-  Settings,
-  ShieldAlert,
-  ShieldCheck,
-  ShieldOff,
-} from 'lucide-vue-next'
+import { BookMarked, ChevronDown, Settings } from 'lucide-vue-next'
 import AccessSites from '@/components/accessSites.vue'
 import { useAccessSites } from '@/composables/useAccessSites'
 import { isValidUrl } from '@/composables/matchesSite'
@@ -170,11 +159,7 @@ onMounted(async () => {
       outlined
       :label="t('popup.openPanel')"
       @click="openSidePanel"
-    >
-      <template #icon>
-        <PanelRight :size="16" />
-      </template>
-    </Button>
+    />
 
     <!--
       Кнопка всегда предлагает обратное текущему состоянию: в белом режиме сайт
@@ -188,11 +173,7 @@ onMounted(async () => {
       size="small"
       :label="t('popup.unblockCurrent', { host: currentHost })"
       @click="unlistCurrent"
-    >
-      <template #icon>
-        <RotateCcw :size="16" />
-      </template>
-    </Button>
+    />
     <Button
       v-else-if="currentHost && isDenyMode && currentTrusted"
       severity="secondary"
@@ -201,11 +182,7 @@ onMounted(async () => {
       :label="t('popup.guardCurrent', { host: currentHost })"
       :title="t('popup.guardCurrentHint')"
       @click="untrustCurrent"
-    >
-      <template #icon>
-        <ShieldCheck :size="16" />
-      </template>
-    </Button>
+    />
     <Button
       v-else-if="currentHost && isDenyMode && currentAllowed"
       severity="secondary"
@@ -214,11 +191,7 @@ onMounted(async () => {
       :label="t('popup.blockCurrent', { host: currentHost })"
       :title="t('popup.blockCurrentHint')"
       @click="listCurrent"
-    >
-      <template #icon>
-        <Ban :size="16" />
-      </template>
-    </Button>
+    />
     <Button
       v-else-if="currentUngranted"
       severity="warn"
@@ -227,11 +200,7 @@ onMounted(async () => {
       :label="t('sites.grantAccessTo', { host: currentHost })"
       :title="t('sites.accessMissing')"
       @click="grantCurrent"
-    >
-      <template #icon>
-        <ShieldAlert :size="16" />
-      </template>
-    </Button>
+    />
     <Button
       v-else-if="currentHost && !isDenyMode && !currentAllowed"
       severity="secondary"
@@ -240,18 +209,13 @@ onMounted(async () => {
       :label="t('popup.addCurrent', { host: currentHost })"
       :title="t('popup.addCurrentHint')"
       @click="listCurrent"
-    >
-      <template #icon>
-        <Plus :size="16" />
-      </template>
-    </Button>
+    />
     <!-- в чёрном режиме сюда попадают адреса, которые бережёт встроенное правило -->
     <div
       v-else-if="currentHost && isDenyMode"
       class="flex flex-col gap-2"
     >
-      <p class="m-0 flex items-center gap-2 text-muted">
-        <ShieldCheck :size="16" />
+      <p class="m-0 text-muted">
         {{ t('popup.currentGuarded') }}
       </p>
       <Button
@@ -261,20 +225,30 @@ onMounted(async () => {
         :label="t('popup.trustCurrent', { host: currentHost })"
         :title="t('popup.trustCurrentHint')"
         @click="trustCurrent"
-      >
-        <template #icon>
-          <ShieldOff :size="16" />
-        </template>
-      </Button>
+      />
     </div>
     <p
       v-else-if="currentHost"
-      class="m-0 flex items-center gap-2 text-muted"
+      class="m-0 text-muted"
     >
-      <Check :size="16" />
       {{ t('popup.currentAllowed') }}
     </p>
 
-    <AccessSites />
+    <!-- список сайтов нужен реже, чем словарь и текущий сайт: свёрнут, пока не попросят -->
+    <details class="group border-t border-line pt-3">
+      <summary
+        class="flex cursor-pointer list-none items-center justify-between gap-2 text-muted
+               [&::-webkit-details-marker]:hidden"
+      >
+        {{ t('nav.sites') }}
+        <ChevronDown
+          :size="16"
+          class="shrink-0 transition-transform group-open:rotate-180"
+        />
+      </summary>
+      <div class="pt-3">
+        <AccessSites />
+      </div>
+    </details>
   </div>
 </template>

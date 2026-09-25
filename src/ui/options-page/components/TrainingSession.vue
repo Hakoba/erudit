@@ -2,6 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Check, X } from 'lucide-vue-next'
+import LevelChip from '@/components/LevelChip.vue'
 import { useDictionary } from '@/composables/useDictionary'
 import { reviewEntry } from '@/utils/srs'
 import type { DictionaryEntry } from '@/types/words'
@@ -116,15 +117,14 @@ onUnmounted((): void => {
 
     <!-- высота задана снизу: без неё карточка подпрыгивает, когда открывается перевод -->
     <div
-      class="relative flex min-h-60 flex-col items-center justify-center gap-4 rounded-2xl
+      class="relative flex min-h-60 flex-col items-center justify-center gap-4 rounded-lg
              border border-line bg-surface-hover p-8 text-center"
     >
-      <span
+      <LevelChip
         v-if="current.level"
-        class="absolute top-4 right-4 rounded bg-surface px-1.5 py-0.5 font-mono text-[11px] text-muted"
-      >
-        {{ current.level }}
-      </span>
+        :level="current.level"
+        class="absolute top-4 right-4"
+      />
 
       <p class="m-0 text-3xl font-semibold">
         {{ current.original }}
@@ -164,27 +164,17 @@ onUnmounted((): void => {
           outlined
           :label="t('training.unknown')"
           @click="answer(false)"
-        >
-          <template #icon>
-            <X :size="16" />
-          </template>
-        </Button>
+        />
         <Button
           severity="success"
           :label="t('training.known')"
           @click="answer(true)"
-        >
-          <template #icon>
-            <Check :size="16" />
-          </template>
-        </Button>
+        />
       </template>
     </div>
 
-    <p class="m-0 text-center">
-      <span class="rounded-full bg-surface-hover px-3 py-1 text-xs text-muted">
-        {{ t(isAnswerVisible ? 'training.keysAnswer' : 'training.keysShow') }}
-      </span>
+    <p class="m-0 text-center text-xs text-muted">
+      {{ t(isAnswerVisible ? 'training.keysAnswer' : 'training.keysShow') }}
     </p>
   </div>
 </template>

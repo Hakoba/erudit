@@ -5,6 +5,8 @@ import { DICTIONARY_URL, isOptionsSection, optionsSectionUrl } from "@/utils/dic
 import { PANEL_OPEN, PANEL_STATE } from "@/utils/panelBus"
 import { SCRIPTS_SYNC } from "@/utils/siteScripts"
 import { syncSiteScripts } from "./siteScripts"
+import { READING_LOG_EVENT } from "@/utils/readingLog"
+import { trackReading } from "./readingLog"
 
 // Sample code if using extensionpay.com
 // import { extPay } from 'src/utils/payment/extPay'
@@ -146,6 +148,7 @@ browser.runtime.onMessage.addListener((message: unknown, sender: Runtime.Message
   }
   if (message.type === SCRIPTS_SYNC) return syncSiteScripts()
   if (message.type === PANEL_STATE) updateBadge(sender.tab?.id, message.state)
+  if (message.type === READING_LOG_EVENT) trackReading(message.event)
   // строго синхронно: жест пользователя не переживает await, панель без него не откроется.
   // Приходит только из Chrome-сборки (кнопка за __HAS_SIDE_PANEL__), в Firefox API нет
   if (message.type === PANEL_OPEN && sender.tab?.id !== undefined) {

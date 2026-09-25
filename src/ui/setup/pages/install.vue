@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { BookOpen, Bot, CircleQuestionMark, ExternalLink, GraduationCap, Languages, Sparkles } from 'lucide-vue-next'
+import { ExternalLink } from 'lucide-vue-next'
 import AccessSites from '@/components/accessSites.vue'
 import AppLoader from '@/components/AppLoader.vue'
+import FormField from '@/components/FormField.vue'
+import SectionPanel from '@/components/SectionPanel.vue'
 import InlineSvg from '@/components/InlineSvg.vue'
 import welcomeArt from '@/assets/illustrations/welcome.svg?raw'
 import { DEMO_URL, useAccessSites } from '@/composables/useAccessSites'
@@ -42,57 +44,55 @@ function openOptions(): void {
 </script>
 
 <template>
-  <Card>
-    <template #title>
-      {{ t('setup.installed', { name: displayName }) }}
-    </template>
-    <template #subtitle>
-      {{ t('setup.installedSubtitle') }}
-    </template>
-    <template #content>
-      <!-- картинка вместо описания: что расширение делает со страницей, видно быстрее,
-           чем читается абзац -->
-      <div class="flex justify-center py-2">
-        <InlineSvg
-          :markup="welcomeArt"
-          class="w-56 text-content"
-        />
-      </div>
+  <div class="flex flex-col gap-6">
+    <div class="flex flex-col gap-2">
+      <h2 class="m-0 text-2xl font-semibold">
+        {{ t('setup.installed', { name: displayName }) }}
+      </h2>
+      <p class="m-0 text-muted">
+        {{ t('setup.installedSubtitle') }}
+      </p>
+    </div>
 
-      <!-- список, а не набор карточек: шагов три и порядок у них важен -->
-      <ol class="m-0 flex list-none flex-col gap-6 p-0 pt-2">
-        <li class="flex flex-col gap-3">
-          <h2 class="m-0 flex items-center gap-2 text-base font-semibold">
-            <GraduationCap :size="18" />
-            {{ t('setup.stepLevel') }}
-          </h2>
-          <p class="m-0 text-muted">
-            {{ t('setup.stepLevelHint') }}
-          </p>
+    <!-- картинка вместо описания: что расширение делает со страницей, видно быстрее,
+         чем читается абзац -->
+    <div class="flex justify-center">
+      <InlineSvg
+        :markup="welcomeArt"
+        class="w-56 text-content"
+      />
+    </div>
 
-          <div class="grid gap-3 sm:grid-cols-3">
-            <div class="flex flex-col gap-2">
-              <label
-                for="setup-level"
-                class="text-muted"
-              >
-                {{ t('settings.language.level') }}
-              </label>
+    <!-- список, а не набор карточек: шагов три и порядок у них важен -->
+    <ol class="m-0 flex list-none flex-col gap-6 p-0">
+      <li>
+        <SectionPanel class="gap-4">
+          <div class="flex flex-col gap-1">
+            <h3 class="m-0 text-base font-semibold">
+              {{ t('setup.stepLevel') }}
+            </h3>
+            <p class="m-0 text-muted">
+              {{ t('setup.stepLevelHint') }}
+            </p>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-3">
+            <FormField
+              :label="t('settings.language.level')"
+              input-id="setup-level"
+            >
               <Select
                 id="setup-level"
                 v-model="settings.level"
                 :options="[...CEFR_LEVELS]"
                 class="w-full"
               />
-            </div>
+            </FormField>
 
-            <div class="flex flex-col gap-2">
-              <label
-                for="setup-source"
-                class="text-muted"
-              >
-                {{ t('settings.language.source') }}
-              </label>
+            <FormField
+              :label="t('settings.language.source')"
+              input-id="setup-source"
+            >
               <Select
                 id="setup-source"
                 v-model="settings.sourceLang"
@@ -101,15 +101,12 @@ function openOptions(): void {
                 option-value="code"
                 class="w-full"
               />
-            </div>
+            </FormField>
 
-            <div class="flex flex-col gap-2">
-              <label
-                for="setup-target"
-                class="text-muted"
-              >
-                {{ t('settings.language.target') }}
-              </label>
+            <FormField
+              :label="t('settings.language.target')"
+              input-id="setup-target"
+            >
               <Select
                 id="setup-target"
                 v-model="settings.targetLang"
@@ -118,47 +115,53 @@ function openOptions(): void {
                 option-value="code"
                 class="w-full"
               />
-            </div>
+            </FormField>
           </div>
-        </li>
+        </SectionPanel>
+      </li>
 
-        <li class="flex flex-col gap-3 border-t border-line pt-6">
-          <h2 class="m-0 flex items-center gap-2 text-base font-semibold">
-            <Languages :size="18" />
-            {{ t('setup.stepSites') }}
-          </h2>
-          <p class="m-0 text-muted">
-            {{ t('setup.stepSitesHint') }}
-          </p>
+      <li>
+        <SectionPanel class="gap-4">
+          <div class="flex flex-col gap-1">
+            <h3 class="m-0 text-base font-semibold">
+              {{ t('setup.stepSites') }}
+            </h3>
+            <p class="m-0 text-muted">
+              {{ t('setup.stepSitesHint') }}
+            </p>
+          </div>
 
           <AccessSites />
-        </li>
+        </SectionPanel>
+      </li>
 
-        <li class="flex flex-col gap-3 border-t border-line pt-6">
-          <h2 class="m-0 flex items-center gap-2 text-base font-semibold">
-            <BookOpen :size="18" />
-            {{ t('setup.stepReady') }}
-          </h2>
-          <p class="m-0 text-muted">
-            {{ t(needsModel ? 'setup.stepReadyModel' : 'setup.stepReadyHint') }}
-          </p>
+      <li>
+        <SectionPanel class="gap-4">
+          <div class="flex flex-col gap-1">
+            <h3 class="m-0 text-base font-semibold">
+              {{ t('setup.stepReady') }}
+            </h3>
+            <p class="m-0 text-muted">
+              {{ t(needsModel ? 'setup.stepReadyModel' : 'setup.stepReadyHint') }}
+            </p>
+          </div>
 
-          <div class="flex flex-wrap gap-2">
-            <a
+          <div class="flex flex-wrap items-center gap-2">
+            <Button
               v-if="demoUrl && !needsModel"
+              as="a"
               :href="demoUrl"
               target="_blank"
               rel="noreferrer noopener"
+              :label="t('setup.tryIt')"
             >
-              <Button :label="t('setup.tryIt')">
-                <template #icon>
-                  <ExternalLink :size="16" />
-                </template>
-              </Button>
-            </a>
+              <template #icon>
+                <ExternalLink :size="16" />
+              </template>
+            </Button>
 
             <!-- словарь пуст после установки: без слов ни подсветки сохранённого,
-                 ни тренировки, ни экспорта в Anki не увидеть -->
+               ни тренировки, ни экспорта в Anki не увидеть -->
             <Button
               v-if="!needsModel"
               severity="secondary"
@@ -168,14 +171,12 @@ function openOptions(): void {
               :disabled="demoState.busy"
               @click="loadDemo(demoLevel)"
             >
-              <template #icon>
+              <template
+                v-if="demoState.busy"
+                #icon
+              >
                 <AppLoader
-                  v-if="demoState.busy"
                   variant="swap"
-                  :size="16"
-                />
-                <Sparkles
-                  v-else
                   :size="16"
                 />
               </template>
@@ -186,31 +187,17 @@ function openOptions(): void {
               :severity="needsModel ? 'primary' : 'secondary'"
               :outlined="!needsModel"
               @click="openOptions"
-            >
-              <template #icon>
-                <Bot
-                  v-if="needsModel"
-                  :size="16"
-                />
-              </template>
-            </Button>
+            />
 
             <!-- справка рядом с первым запуском: вопросы про уровень и список сайтов
-                 возникают именно здесь, а не когда пользователь дойдёт до настроек -->
+               возникают именно здесь, а не когда пользователь дойдёт до настроек -->
             <a
               :href="faqUrl"
               target="_blank"
               rel="noreferrer noopener"
+              class="px-2 text-muted underline decoration-line underline-offset-4 hover:text-content"
             >
-              <Button
-                severity="secondary"
-                text
-                :label="t('nav.faq')"
-              >
-                <template #icon>
-                  <CircleQuestionMark :size="16" />
-                </template>
-              </Button>
+              {{ t('nav.faq') }}
             </a>
           </div>
 
@@ -221,8 +208,8 @@ function openOptions(): void {
           >
             {{ demoState.message }}
           </Message>
-        </li>
-      </ol>
-    </template>
-  </Card>
+        </SectionPanel>
+      </li>
+    </ol>
+  </div>
 </template>

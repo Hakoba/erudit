@@ -6,6 +6,7 @@ import Button from 'primevue/button'
 import Message from 'primevue/message'
 import WordItem from '@/components/WordItem.vue'
 import InlineSvg from '@/components/InlineSvg.vue'
+import LevelChip from '@/components/LevelChip.vue'
 import allKnownArt from '@/assets/illustrations/all-known.svg?raw'
 import analyzeOffArt from '@/assets/illustrations/analyze-off.svg?raw'
 import errorArt from '@/assets/illustrations/error.svg?raw'
@@ -144,23 +145,17 @@ function isOnPage(word: WordWithExplanation): boolean {
         <li
           v-for="word in immersionWords"
           :key="word.original"
-          class="flex items-start gap-2 rounded-lg border border-line bg-surface-hover px-3 py-2.5"
+          class="flex items-start gap-2 rounded-md bg-surface-hover px-3 py-2.5"
         >
           <div class="flex min-w-0 flex-1 flex-col gap-0.5">
             <p class="m-0 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-              <!-- зелёный кружок — тот же цвет, которым слово помечено в тексте -->
-              <span
-                class="size-2 shrink-0 rounded-full bg-mark-saved"
-                aria-hidden="true"
-              />
               <span class="font-semibold">{{ word.original }}</span>
               <span class="text-muted">{{ word.translate }}</span>
-              <span
+              <LevelChip
                 v-if="word.level"
-                class="rounded bg-surface px-1.5 py-0.5 text-[11px] font-medium text-muted"
-              >
-                {{ word.level }}
-              </span>
+                :level="word.level"
+                class="bg-surface"
+              />
             </p>
             <p class="m-0 text-sm text-muted">
               {{ t('overlay.immersionOriginal', { form: word.form }) }}
@@ -172,7 +167,7 @@ function isOnPage(word: WordWithExplanation): boolean {
             severity="secondary"
             text
             rounded
-            v-bind="hintAttrs(t('overlay.revealHint'))"
+            v-bind="hintAttrs(t('overlay.reveal'))"
             :aria-label="t('overlay.reveal')"
             @click="emit('reveal', word.original)"
           >

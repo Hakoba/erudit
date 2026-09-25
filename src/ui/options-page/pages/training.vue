@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import SectionPanel from '@/components/SectionPanel.vue'
 import InlineSvg from '@/components/InlineSvg.vue'
 import doneArt from '@/assets/illustrations/training-done.svg?raw'
 import emptyArt from '@/assets/illustrations/training-empty.svg?raw'
@@ -51,69 +52,69 @@ function leaveSummary(): void {
 </script>
 
 <template>
-  <Card>
-    <template #title>
-      {{ t('training.title') }}
-    </template>
-    <template #subtitle>
-      {{ t('training.subtitle') }}
-    </template>
+  <div class="flex max-w-3xl flex-col gap-6">
+    <div class="flex flex-col gap-2">
+      <h2 class="m-0 text-2xl font-semibold">
+        {{ t('training.title') }}
+      </h2>
+      <p class="m-0 text-muted">
+        {{ t('training.subtitle') }}
+      </p>
+    </div>
 
-    <template #content>
-      <div class="pt-2">
-        <TrainingSession
-          v-if="queue.length"
-          :queue="queue"
-          @finish="finishSession"
+    <SectionPanel>
+      <TrainingSession
+        v-if="queue.length"
+        :queue="queue"
+        @finish="finishSession"
+      />
+
+      <div
+        v-else-if="result"
+        class="flex flex-col items-center gap-4 py-4 text-center"
+      >
+        <InlineSvg
+          :markup="doneArt"
+          class="w-40 text-content"
         />
-
-        <div
-          v-else-if="result"
-          class="flex flex-col items-center gap-4 py-4 text-center"
-        >
-          <InlineSvg
-            :markup="doneArt"
-            class="w-40 text-content"
-          />
-          <p class="m-0 max-w-sm">
-            {{ t('training.finished', { known: result.known, unknown: result.unknown }) }}
-          </p>
-          <Button
-            v-if="dueCount"
-            autofocus
-            severity="secondary"
-            :label="t('training.more', { words: sessionLabel })"
-            @click="startSession"
-          />
-          <Button
-            v-else
-            autofocus
-            severity="secondary"
-            :label="t('training.back')"
-            @click="leaveSummary"
-          />
-        </div>
-
-        <!-- тренировать нечего: сначала надо набрать слов на странице -->
-        <div
-          v-else-if="!entries.length"
-          class="flex flex-col items-center gap-4 py-6 text-center"
-        >
-          <InlineSvg
-            :markup="emptyArt"
-            class="w-44 text-content"
-          />
-          <p class="m-0 max-w-sm text-muted">
-            {{ t('training.dictionaryEmpty') }}
-          </p>
-        </div>
-
-        <TrainingStart
+        <p class="m-0 max-w-sm">
+          {{ t('training.finished', { known: result.known, unknown: result.unknown }) }}
+        </p>
+        <Button
+          v-if="dueCount"
+          autofocus
+          severity="secondary"
+          :label="t('training.more', { words: sessionLabel })"
+          @click="startSession"
+        />
+        <Button
           v-else
-          :entries="entries"
-          @start="startSession"
+          autofocus
+          severity="secondary"
+          :label="t('training.back')"
+          @click="leaveSummary"
         />
       </div>
-    </template>
-  </Card>
+
+      <!-- тренировать нечего: сначала надо набрать слов на странице -->
+      <div
+        v-else-if="!entries.length"
+        class="flex flex-col items-center gap-4 py-6 text-center"
+      >
+        <InlineSvg
+          :markup="emptyArt"
+          class="w-44 text-content"
+        />
+        <p class="m-0 max-w-sm text-muted">
+          {{ t('training.dictionaryEmpty') }}
+        </p>
+      </div>
+
+      <TrainingStart
+        v-else
+        :entries="entries"
+        @start="startSession"
+      />
+    </SectionPanel>
+  </div>
 </template>

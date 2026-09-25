@@ -25,11 +25,6 @@
   --color-learning: #5c8f9e;
 }
 
-/* В тёмной теме тень карточки не видна, и блок сливается с фоном страницы */
-.dark .p-card {
-  border: 1px solid var(--p-content-border-color);
-}
-
 body {
   margin: 0;
   background: var(--p-content-background);

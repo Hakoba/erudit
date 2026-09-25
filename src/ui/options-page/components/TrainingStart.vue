@@ -5,6 +5,7 @@ import InlineSvg from '@/components/InlineSvg.vue'
 import doneArt from '@/assets/illustrations/training-done.svg?raw'
 import scheduleArt from '@/assets/illustrations/training-schedule.svg?raw'
 import TrainingProgressRing from './TrainingProgressRing.vue'
+import { TRAINING_STAGES } from './trainingStages'
 import { SESSION_SIZE, countProgress, dueEntries, nextDueAt } from '@/utils/srs'
 import type { DictionaryProgress } from '@/utils/srs'
 import type { DictionaryEntry } from '@/types/words'
@@ -13,15 +14,6 @@ import type { DictionaryEntry } from '@/types/words'
 const props = defineProps<{ entries: DictionaryEntry[] }>()
 
 const emit = defineEmits<{ start: [] }>()
-
-// стадии заданы одним списком: он же задаёт порядок дуг в кольце и строк в легенде.
-// классы прописаны целиком — из склеенных имён Tailwind ничего не собирает. `brand`
-// в цвета стадий не годится: в этой теме это тот же янтарь, что и у «новых»
-const STAGES: { key: keyof DictionaryProgress; labelKey: string; stroke: string; dot: string }[] = [
-  { key: 'learned', labelKey: 'training.learned', stroke: 'stroke-mark-saved', dot: 'bg-mark-saved' },
-  { key: 'learning', labelKey: 'training.learning', stroke: 'stroke-learning', dot: 'bg-learning' },
-  { key: 'fresh', labelKey: 'training.fresh', stroke: 'stroke-mark-new', dot: 'bg-mark-new' },
-]
 
 // composables
 const { t, locale } = useI18n()
@@ -51,7 +43,7 @@ const nextDueLabel = computed<string>(() => {
       <div class="relative size-36 shrink-0">
         <TrainingProgressRing
           :progress="progress"
-          :stages="STAGES"
+          :stages="TRAINING_STAGES"
         />
 
         <!-- в дырке кольца — сумма его же долей, поэтому подпись только про словарь -->
@@ -63,7 +55,7 @@ const nextDueLabel = computed<string>(() => {
 
       <dl class="m-0 flex flex-col gap-3">
         <div
-          v-for="stage in STAGES"
+          v-for="stage in TRAINING_STAGES"
           :key="stage.key"
           class="flex items-center gap-3"
         >

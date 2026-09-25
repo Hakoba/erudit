@@ -2,6 +2,7 @@
 import { onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppLoader from '@/components/AppLoader.vue'
+import LevelChip from '@/components/LevelChip.vue'
 import type { LookupResult, LookupSense } from '@/types/lookup'
 import type { CefrLevel } from '@/types/words'
 import { YANDEX_DICT_URL, lookupTerm } from '@/utils/dictClient'
@@ -64,17 +65,15 @@ function senseText(sense: LookupSense): string {
 
 <template>
   <div
-    class="flex max-w-72 flex-col gap-1.5 rounded-xl border border-line bg-surface px-3.5 py-2.5
+    class="flex max-w-72 flex-col gap-1.5 rounded-lg border border-line bg-surface px-3.5 py-2.5
               text-sm text-content shadow-[0_10px_32px_-8px_rgba(0,0,0,.35)]"
   >
     <p class="m-0 flex flex-wrap items-center gap-x-2 gap-y-1">
       <span class="font-semibold">{{ term }}</span>
-      <span
+      <LevelChip
         v-if="level"
-        class="rounded-full border border-line px-1.5 py-0.5 text-[11px] font-medium text-muted"
-      >
-        {{ level }}
-      </span>
+        :level="level"
+      />
       <span
         v-if="lookup?.transcription"
         class="text-xs text-muted"

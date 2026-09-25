@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { BookA, ExternalLink, Globe, KeyRound, Languages, Link, Mail } from 'lucide-vue-next'
+import SectionPanel from '@/components/SectionPanel.vue'
+import { ExternalLink } from 'lucide-vue-next'
+import FormField from '@/components/FormField.vue'
 import HostAccess from '@/components/HostAccess.vue'
-import InlineSvg from '@/components/InlineSvg.vue'
 import { useHostAccess } from '@/composables/useHostAccess'
 import { credentialsFor } from '@/utils/mtClient'
-import dictionariesArt from '@/assets/illustrations/dictionaries.svg?raw'
 import { useDictSettings } from '@/composables/useDictSettings'
 import { YANDEX_LOOKUP_ORIGIN } from '@/utils/dictClient'
 import type { Translator } from '@/utils/mt/translators'
@@ -47,245 +47,177 @@ function applyTranslator(id: TranslatorId): void {
 </script>
 
 <template>
-  <Card>
-    <template #title>
-      <div class="flex items-center justify-between gap-4">
-        <span class="flex items-center gap-2">
-          <BookA :size="20" />
-          {{ t('settings.dictionaries.title') }}
-        </span>
-        <!-- эмблема раздела: словарная статья, которую собирают эти настройки -->
-        <InlineSvg
-          :markup="dictionariesArt"
-          class="w-20 text-content"
+  <div class="flex max-w-3xl flex-col gap-6">
+    <h2 class="m-0 text-2xl font-semibold">
+      {{ t('settings.dictionaries.title') }}
+    </h2>
+
+    <SectionPanel>
+      <FormField
+        :label="t('settings.dictionaries.translator')"
+        input-id="translator"
+        :hint="t('settings.dictionaries.translatorHint')"
+      >
+        <Select
+          id="translator"
+          :model-value="settings.translator"
+          :options="translatorOptions"
+          option-label="title"
+          option-value="id"
+          class="w-full sm:w-80"
+          @update:model-value="applyTranslator"
         />
-      </div>
-    </template>
-    <template #subtitle>
-      {{ t('settings.dictionaries.subtitle') }}
-    </template>
-    <template #content>
-      <div class="flex flex-col gap-4 pt-2">
-        <div class="flex flex-col gap-2">
-          <label
-            for="translator"
-            class="flex items-center gap-2 text-muted"
-          >
-            <Languages :size="14" />
-            {{ t('settings.dictionaries.translator') }}
-          </label>
-          <Select
-            id="translator"
-            :model-value="settings.translator"
-            :options="translatorOptions"
-            option-label="title"
-            option-value="id"
-            class="w-full sm:w-80"
-            @update:model-value="applyTranslator"
-          />
-          <small class="text-muted">
-            {{ t('settings.dictionaries.translatorHint') }}
-          </small>
-          <HostAccess :urls="translatorUrls" />
-        </div>
+        <HostAccess :urls="translatorUrls" />
+      </FormField>
 
-        <Message
-          v-if="translator?.unofficial"
-          severity="warn"
-          size="small"
-          variant="simple"
-        >
-          {{ t('settings.dictionaries.unofficialHint', { title: translator.title }) }}
-        </Message>
+      <Message
+        v-if="translator?.unofficial"
+        severity="warn"
+        size="small"
+        variant="simple"
+      >
+        {{ t('settings.dictionaries.unofficialHint', { title: translator.title }) }}
+      </Message>
 
-        <div
-          v-if="settings.translator === 'yandex'"
-          class="flex flex-col gap-2"
+      <FormField
+        v-if="settings.translator === 'yandex'"
+        :label="t('settings.dictionaries.yandexKey')"
+        input-id="dict-yandex-key"
+        :hint="t('settings.dictionaries.yandexHint')"
+      >
+        <Password
+          v-model="settings.yandexKey"
+          input-id="dict-yandex-key"
+          toggle-mask
+          :feedback="false"
+          fluid
+          :input-props="{ autocomplete: 'off' }"
+          placeholder="dict.1.1..."
+        />
+      </FormField>
+
+      <FormField
+        v-if="settings.translator === 'mymemory'"
+        :label="t('settings.dictionaries.myMemoryEmail')"
+        input-id="mymemory-email"
+        :hint="t('settings.dictionaries.myMemoryHint')"
+      >
+        <InputText
+          id="mymemory-email"
+          v-model="settings.myMemoryEmail"
+          type="email"
+          autocomplete="off"
+          placeholder="reader@example.com"
+        />
+      </FormField>
+
+      <FormField
+        v-if="settings.translator === 'lingva'"
+        :label="t('settings.dictionaries.lingvaUrl')"
+        input-id="lingva-url"
+      >
+        <InputText
+          id="lingva-url"
+          v-model="settings.lingvaUrl"
+          placeholder="https://lingva.ml"
+        />
+        <template #hint>
+          {{ t('settings.dictionaries.lingvaHint') }}
+          <a
+            href="https://github.com/thedaviddelta/lingva-translate#instances"
+            target="_blank"
+            rel="noreferrer noopener"
+            class="inline-flex items-center gap-1 underline underline-offset-2"
+          >github.com/thedaviddelta/lingva-translate<ExternalLink :size="12" /></a>.
+        </template>
+      </FormField>
+
+      <template v-if="settings.translator === 'azure'">
+        <FormField
+          :label="t('settings.dictionaries.azureKey')"
+          input-id="azure-key"
+          :hint="t('settings.dictionaries.azureHint')"
         >
-          <label
-            for="dict-yandex-key"
-            class="flex items-center gap-2 text-muted"
-          >
-            <KeyRound :size="14" />
-            {{ t('settings.dictionaries.yandexKey') }}
-          </label>
           <Password
-            v-model="settings.yandexKey"
-            input-id="dict-yandex-key"
+            v-model="settings.azureKey"
+            input-id="azure-key"
             toggle-mask
             :feedback="false"
             fluid
             :input-props="{ autocomplete: 'off' }"
-            placeholder="dict.1.1..."
           />
-          <small class="text-muted">
-            {{ t('settings.dictionaries.yandexHint') }}
-          </small>
-        </div>
+        </FormField>
 
-        <div
-          v-if="settings.translator === 'mymemory'"
-          class="flex flex-col gap-2"
+        <FormField
+          :label="t('settings.dictionaries.azureRegion')"
+          input-id="azure-region"
+          :hint="t('settings.dictionaries.azureRegionHint')"
         >
-          <label
-            for="mymemory-email"
-            class="flex items-center gap-2 text-muted"
-          >
-            <Mail :size="14" />
-            {{ t('settings.dictionaries.myMemoryEmail') }}
-          </label>
           <InputText
-            id="mymemory-email"
-            v-model="settings.myMemoryEmail"
-            type="email"
-            autocomplete="off"
-            placeholder="reader@example.com"
+            id="azure-region"
+            v-model="settings.azureRegion"
+            placeholder="westeurope"
           />
-          <small class="text-muted">
-            {{ t('settings.dictionaries.myMemoryHint') }}
-          </small>
-        </div>
+        </FormField>
+      </template>
 
-        <div
-          v-if="settings.translator === 'lingva'"
-          class="flex flex-col gap-2"
-        >
-          <label
-            for="lingva-url"
-            class="flex items-center gap-2 text-muted"
-          >
-            <Link :size="14" />
-            {{ t('settings.dictionaries.lingvaUrl') }}
-          </label>
-          <InputText
-            id="lingva-url"
-            v-model="settings.lingvaUrl"
-            placeholder="https://lingva.ml"
-          />
-          <small class="text-muted">
-            {{ t('settings.dictionaries.lingvaHint') }}
-            <a
-              href="https://github.com/thedaviddelta/lingva-translate#instances"
-              target="_blank"
-              rel="noreferrer noopener"
-              class="inline-flex items-center gap-1 underline underline-offset-2"
-            >github.com/thedaviddelta/lingva-translate<ExternalLink :size="12" /></a>.
-          </small>
-        </div>
-
-        <template v-if="settings.translator === 'azure'">
-          <div class="flex flex-col gap-2">
-            <label
-              for="azure-key"
-              class="flex items-center gap-2 text-muted"
-            >
-              <KeyRound :size="14" />
-              {{ t('settings.dictionaries.azureKey') }}
-            </label>
-            <Password
-              v-model="settings.azureKey"
-              input-id="azure-key"
-              toggle-mask
-              :feedback="false"
-              fluid
-              :input-props="{ autocomplete: 'off' }"
-            />
-            <small class="text-muted">
-              {{ t('settings.dictionaries.azureHint') }}
-            </small>
-          </div>
-
-          <div class="flex flex-col gap-2">
-            <label
-              for="azure-region"
-              class="flex items-center gap-2 text-muted"
-            >
-              <Globe :size="14" />
-              {{ t('settings.dictionaries.azureRegion') }}
-            </label>
-            <InputText
-              id="azure-region"
-              v-model="settings.azureRegion"
-              placeholder="westeurope"
-            />
-            <small class="text-muted">
-              {{ t('settings.dictionaries.azureRegionHint') }}
-            </small>
-          </div>
+      <FormField
+        v-if="settings.translator === 'deepl'"
+        :label="t('settings.dictionaries.deeplKey')"
+        input-id="deepl-key"
+      >
+        <Password
+          v-model="settings.deeplKey"
+          input-id="deepl-key"
+          toggle-mask
+          :feedback="false"
+          fluid
+          :input-props="{ autocomplete: 'off' }"
+          placeholder="xxxxxxxx-xxxx-…:fx"
+        />
+        <template #hint>
+          {{ t('settings.dictionaries.deeplHint') }}
+          <a
+            href="https://www.deepl.com/pro-api"
+            target="_blank"
+            rel="noreferrer noopener"
+            class="inline-flex items-center gap-1 underline underline-offset-2"
+          >deepl.com/pro-api<ExternalLink :size="12" /></a>.
         </template>
+      </FormField>
 
-        <div
-          v-if="settings.translator === 'deepl'"
-          class="flex flex-col gap-2"
+      <template v-if="settings.translator === 'libre'">
+        <FormField
+          :label="t('settings.dictionaries.libreUrl')"
+          input-id="libre-url"
         >
-          <label
-            for="deepl-key"
-            class="flex items-center gap-2 text-muted"
-          >
-            <KeyRound :size="14" />
-            {{ t('settings.dictionaries.deeplKey') }}
-          </label>
+          <InputText
+            id="libre-url"
+            v-model="settings.libreUrl"
+            placeholder="https://libretranslate.com"
+          />
+        </FormField>
+
+        <FormField
+          :label="t('settings.dictionaries.libreKey')"
+          input-id="libre-key"
+        >
           <Password
-            v-model="settings.deeplKey"
-            input-id="deepl-key"
+            v-model="settings.libreKey"
+            input-id="libre-key"
             toggle-mask
             :feedback="false"
             fluid
             :input-props="{ autocomplete: 'off' }"
-            placeholder="xxxxxxxx-xxxx-…:fx"
+            :placeholder="t('settings.dictionaries.libreKeyPlaceholder')"
           />
-          <small class="text-muted">
-            {{ t('settings.dictionaries.deeplHint') }}
-            <a
-              href="https://www.deepl.com/pro-api"
-              target="_blank"
-              rel="noreferrer noopener"
-              class="inline-flex items-center gap-1 underline underline-offset-2"
-            >deepl.com/pro-api<ExternalLink :size="12" /></a>.
-          </small>
-        </div>
+        </FormField>
+      </template>
 
-        <template v-if="settings.translator === 'libre'">
-          <div class="flex flex-col gap-2">
-            <label
-              for="libre-url"
-              class="flex items-center gap-2 text-muted"
-            >
-              <Link :size="14" />
-              {{ t('settings.dictionaries.libreUrl') }}
-            </label>
-            <InputText
-              id="libre-url"
-              v-model="settings.libreUrl"
-              placeholder="https://libretranslate.com"
-            />
-          </div>
-
-          <div class="flex flex-col gap-2">
-            <label
-              for="libre-key"
-              class="flex items-center gap-2 text-muted"
-            >
-              <KeyRound :size="14" />
-              {{ t('settings.dictionaries.libreKey') }}
-            </label>
-            <Password
-              v-model="settings.libreKey"
-              input-id="libre-key"
-              toggle-mask
-              :feedback="false"
-              fluid
-              :input-props="{ autocomplete: 'off' }"
-              :placeholder="t('settings.dictionaries.libreKeyPlaceholder')"
-            />
-          </div>
-        </template>
-
-        <!-- толкования не выбираются: они бесплатны, ключа не просят и нужны только карточке -->
-        <small class="border-t border-line pt-4 text-muted">
-          {{ t('settings.dictionaries.definitions') }}
-        </small>
-      </div>
-    </template>
-  </Card>
+      <!-- толкования не выбираются: они бесплатны, ключа не просят и нужны только карточке -->
+      <p class="m-0 text-muted">
+        {{ t('settings.dictionaries.definitions') }}
+      </p>
+    </SectionPanel>
+  </div>
 </template>

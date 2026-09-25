@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { RefreshCw, SquareDashedMousePointer } from 'lucide-vue-next'
-import Badge from 'primevue/badge'
 import Button from 'primevue/button'
 import { useI18n } from 'vue-i18n'
 import AppLoader from '@/components/AppLoader.vue'
@@ -32,7 +31,7 @@ const emit = defineEmits<{
       severity="secondary"
       size="small"
       :aria-label="t('overlay.expand')"
-      :data-hint="t('overlay.expandHint')"
+      :data-hint="t('overlay.expand')"
       @click="emit('expand')"
     >
       <AppLogo :size="18" />
@@ -49,12 +48,13 @@ const emit = defineEmits<{
       <AppLoader :size="18" />
     </span>
 
-    <Badge
+    <span
       v-else-if="wordsCount"
-      :value="String(wordsCount)"
-      severity="info"
+      class="rounded bg-brand px-1.5 py-0.5 text-xs font-semibold text-[var(--p-primary-contrast-color)]"
       :aria-label="t('overlay.wordsFound')"
-    />
+    >
+      {{ wordsCount }}
+    </span>
 
     <Button
       v-if="isPicking"
@@ -63,7 +63,7 @@ const emit = defineEmits<{
       severity="primary"
       size="small"
       :aria-label="t('overlay.pickAreaCancel')"
-      :data-hint="t('overlay.pickAreaCancelHint')"
+      :data-hint="t('overlay.pickAreaCancel')"
       @click="emit('cancelPicking')"
     >
       <SquareDashedMousePointer :size="16" />

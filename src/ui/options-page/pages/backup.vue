@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { DatabaseBackup, Download, RotateCw, Upload } from 'lucide-vue-next'
+import SectionPanel from '@/components/SectionPanel.vue'
+import { Download } from 'lucide-vue-next'
 import AppLoader from '@/components/AppLoader.vue'
-import InlineSvg from '@/components/InlineSvg.vue'
-import backupArt from '@/assets/illustrations/backup.svg?raw'
 import {
   backupFileName,
   backupWordCount,
@@ -59,7 +58,7 @@ function importErrorMessage(error: unknown): string {
     'backup-newer': 'errors.backupNewer',
   }
 
-  return known[code] ? t(known[code]) : t('errors.backupFailed')
+  return known[code] ? t(known[code]) : t('errors.backupFailed', { reason: code || String(error) })
 }
 
 /**
@@ -101,101 +100,80 @@ async function importBackup(event: Event): Promise<void> {
 </script>
 
 <template>
-  <Card>
-    <template #title>
-      <div class="flex items-center justify-between gap-4">
-        <span class="flex items-center gap-2">
-          <DatabaseBackup :size="20" />
-          {{ t('backup.title') }}
-        </span>
-        <InlineSvg
-          :markup="backupArt"
-          class="w-24 text-content"
-        />
-      </div>
-    </template>
-    <template #subtitle>
-      {{ t('backup.subtitle') }}
-    </template>
-    <template #content>
-      <div class="flex flex-col gap-4 pt-2">
-        <Message
-          v-if="importState.message"
-          :severity="importState.failed ? 'error' : 'success'"
-          :closable="false"
-        >
-          <div class="flex flex-wrap items-center gap-3">
-            <span>{{ importState.message }}</span>
-            <Button
-              v-if="importState.done"
-              size="small"
-              severity="secondary"
-              :label="t('backup.reload')"
-              @click="reloadPage"
-            >
-              <template #icon>
-                <RotateCw :size="16" />
-              </template>
-            </Button>
-          </div>
-        </Message>
+  <div class="flex max-w-3xl flex-col gap-6">
+    <div class="flex flex-col gap-2">
+      <h2 class="m-0 text-2xl font-semibold">
+        {{ t('backup.title') }}
+      </h2>
+      <p class="m-0 text-muted">
+        {{ t('backup.subtitle') }}
+      </p>
+    </div>
 
-        <div class="flex flex-col gap-2 border-t border-line pt-4">
-          <div class="flex flex-wrap gap-2">
-            <Button
-              :disabled="isExporting"
-              :label="isExporting ? t('backup.exportBusy') : t('backup.export')"
-              @click="exportBackup"
-            >
-              <template #icon>
-                <AppLoader
-                  v-if="isExporting"
-                  :size="16"
-                />
-                <Download
-                  v-else
-                  :size="16"
-                />
-              </template>
-            </Button>
-            <Button
-              severity="secondary"
-              outlined
-              :disabled="importState.busy"
-              :label="importState.busy ? t('backup.importBusy') : t('backup.import')"
-              @click="$file?.click()"
-            >
-              <template #icon>
-                <AppLoader
-                  v-if="importState.busy"
-                  :size="16"
-                />
-                <Upload
-                  v-else
-                  :size="16"
-                />
-              </template>
-            </Button>
-            <input
-              ref="$file"
-              type="file"
-              accept="application/json,.json"
-              class="hidden"
-              @change="importBackup"
-            >
-          </div>
-          <small class="text-muted">{{ t('backup.exportHint') }}</small>
-          <small class="text-muted">{{ t('backup.importHint') }}</small>
+    <SectionPanel>
+      <Message
+        v-if="importState.message"
+        :severity="importState.failed ? 'error' : 'success'"
+        :closable="false"
+      >
+        <div class="flex flex-wrap items-center gap-3">
+          <span>{{ importState.message }}</span>
+          <Button
+            v-if="importState.done"
+            size="small"
+            severity="secondary"
+            :label="t('backup.reload')"
+            @click="reloadPage"
+          />
         </div>
+      </Message>
 
-        <Message
-          severity="warn"
-          size="small"
-          variant="simple"
+      <div class="flex flex-wrap gap-2">
+        <Button
+          :disabled="isExporting"
+          :label="isExporting ? t('backup.exportBusy') : t('backup.export')"
+          @click="exportBackup"
         >
-          {{ t('backup.keysWarning') }}
-        </Message>
+          <template #icon>
+            <AppLoader
+              v-if="isExporting"
+              :size="16"
+            />
+            <Download
+              v-else
+              :size="16"
+            />
+          </template>
+        </Button>
+        <Button
+          severity="secondary"
+          outlined
+          :disabled="importState.busy"
+          :label="importState.busy ? t('backup.importBusy') : t('backup.import')"
+          @click="$file?.click()"
+        >
+          <template
+            v-if="importState.busy"
+            #icon
+          >
+            <AppLoader :size="16" />
+          </template>
+        </Button>
+        <input
+          ref="$file"
+          type="file"
+          accept="application/json,.json"
+          class="hidden"
+          @change="importBackup"
+        >
       </div>
-    </template>
-  </Card>
+
+      <p class="m-0 text-muted">
+        {{ t('backup.exportHint') }} {{ t('backup.importHint') }}
+      </p>
+      <p class="m-0">
+        <strong>{{ t('backup.keysWarning') }}</strong>
+      </p>
+    </SectionPanel>
+  </div>
 </template>

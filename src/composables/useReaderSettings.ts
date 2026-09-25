@@ -61,7 +61,7 @@ export const DEFAULT_READER_SETTINGS: ReaderSettings = {
   // интерфейс переведён не на все языки: незнакомый язык браузера уводим в английский
   uiLang: defaultUiLanguage(),
   immersion: false,
-  selectionMode: 'translate',
+  selectionMode: 'hint',
   llmPhrases: true,
 }
 

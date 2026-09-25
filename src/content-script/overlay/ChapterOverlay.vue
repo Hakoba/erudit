@@ -2,7 +2,6 @@
 import { computed, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { BookmarkCheck, BookmarkPlus, EyeOff, RotateCw } from 'lucide-vue-next'
-import Badge from 'primevue/badge'
 import Button from 'primevue/button'
 import AppLoader from '@/components/AppLoader.vue'
 import OverlayHeader from '@/components/OverlayHeader.vue'
@@ -20,6 +19,7 @@ import { type SelectionMode, useReaderSettings } from '@/composables/useReaderSe
 import { isFromOverlay, type SelectionAnchor, useTextSelection } from '@/composables/useTextSelection'
 import { startAreaPicker } from '@/content-script/areaPicker'
 import { isPanelOpen, publishPanelState, releasePanelCommandHandler, requestPanelOpen, setPanelCommandHandler } from '@/content-script/panelBridge'
+import { reportReading } from '@/content-script/readingReport'
 import type { PanelCommand } from '@/utils/panelBus'
 import { clearHighlights, hasOccurrence, highlightTerms, replaceTerms, restoreReplacement, revealTerm } from '@/utils/highlight'
 import { type ImmersionMatch, isTargetLanguageText, pickImmersionWords } from '@/utils/immersion'
@@ -322,7 +322,9 @@ async function analyze(full = false): Promise<void> {
     isImmersionActive.value = false
   }
 
-  return fetchDifficultWords(full, pageText)
+  // в журнал идёт только состоявшийся разбор: отказ переводчика слова не отменяет,
+  // а таймаут модели или пустая страница чтением не считаются
+  if (await fetchDifficultWords(full, pageText) === 'ok') reportReading(words.value.length, full)
 }
 
 /** Затянувшийся разбор отменили: возвращаемся к состоянию «разобрать руками» */
@@ -677,8 +679,7 @@ async function translateAndSave(): Promise<void> {
     type="button"
     class="fixed! right-0 top-1/2 flex -translate-y-[calc(50%+20px)] cursor-pointer flex-col
            items-center gap-1.5 rounded-l-lg border border-r-0 border-line bg-surface px-1.5
-           py-2.5 text-content shadow-[-10px_0_24px_-6px_rgba(0,0,0,.35),-3px_0_8px_-4px_rgba(0,0,0,.3)]
-           hover:bg-surface-hover hover:shadow-[-12px_0_28px_-6px_rgba(0,0,0,.45),-3px_0_10px_-4px_rgba(0,0,0,.35)]"
+           py-2.5 text-content shadow-[-8px_0_24px_-8px_rgba(0,0,0,.35)] hover:bg-surface-hover"
     :aria-label="t('popup.openPanel')"
     :data-hint="t('popup.openPanel')"
     @click="requestPanelOpen"
@@ -692,12 +693,13 @@ async function translateAndSave(): Promise<void> {
       v-else
       :size="16"
     />
-    <Badge
+    <span
       v-if="!isLoading && newWords.length"
-      :value="String(newWords.length)"
-      severity="info"
+      class="rounded bg-brand px-1.5 py-0.5 text-xs font-semibold text-[var(--p-primary-contrast-color)]"
       :aria-label="t('overlay.wordsFound')"
-    />
+    >
+      {{ newWords.length }}
+    </span>
   </button>
 
   <!-- панель прижата к краю на всю высоту: ровно на её ширину ужата и сама страница.

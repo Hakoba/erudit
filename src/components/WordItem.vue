@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { BookmarkCheck, BookmarkPlus, Crosshair, EyeOff } from 'lucide-vue-next'
 import Button from 'primevue/button'
 import AppLoader from '@/components/AppLoader.vue'
+import LevelChip from '@/components/LevelChip.vue'
 import LookupPanel from '@/components/LookupPanel.vue'
 import type { WordWithExplanation } from '@/types/words'
 import { useDictionary } from '@/composables/useDictionary'
@@ -57,8 +58,8 @@ async function loadExplanation(): Promise<void> {
     // модели хватает предложения: страница целиком и дороже, и тянет пересказывать её
     const text = await requestExplanation(props.word.original, findSentence(props.sourceText, props.word.original) ?? '')
     explanation.value = text || t('overlay.explanationFailed')
-  } catch {
-    explanation.value = t('overlay.explanationFailed')
+  } catch (error) {
+    explanation.value = t('overlay.explanationFailed', { reason: error instanceof Error ? error.message : String(error) })
   } finally {
     isExplanationLoading.value = false
   }
@@ -72,7 +73,7 @@ function addToDictionary(): void {
 
 <template>
   <!-- фон, а не только рамка: на тёмной теме граница почти сливается с панелью -->
-  <li class="flex flex-col gap-0.5 rounded-lg border border-line bg-surface-hover px-3 py-2.5">
+  <li class="flex flex-col gap-0.5 rounded-md bg-surface-hover px-3 py-2.5">
     <div class="flex items-start gap-2">
       <div class="flex min-w-0 flex-1 flex-col gap-0.5">
         <p class="m-0 flex flex-wrap items-baseline gap-x-2 gap-y-1">
@@ -82,7 +83,7 @@ function addToDictionary(): void {
             type="button"
             class="cursor-pointer border-0 bg-transparent p-0 font-[inherit] text-[length:inherit]
                    font-semibold text-content underline decoration-dotted underline-offset-4"
-            v-bind="hintAttrs(t('overlay.revealHint'))"
+            v-bind="hintAttrs(t('overlay.reveal'))"
             @click="emit('reveal')"
           >
             {{ word.original }}
@@ -92,12 +93,11 @@ function addToDictionary(): void {
             class="font-semibold"
           >{{ word.original }}</span>
           <span class="text-muted">{{ word.translate }}</span>
-          <span
+          <LevelChip
             v-if="word.level"
-            class="rounded bg-surface px-1.5 py-0.5 text-[11px] font-medium text-muted"
-          >
-            {{ word.level }}
-          </span>
+            :level="word.level"
+            class="bg-surface"
+          />
         </p>
 
         <div class="-mx-2">
@@ -120,7 +120,7 @@ function addToDictionary(): void {
           severity="secondary"
           text
           rounded
-          v-bind="hintAttrs(t('overlay.revealHint'))"
+          v-bind="hintAttrs(t('overlay.reveal'))"
           :aria-label="t('overlay.reveal')"
           @click="emit('reveal')"
         >

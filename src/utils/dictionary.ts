@@ -1,4 +1,5 @@
 import type { CefrLevel, DictionaryEntry } from '@/types/words'
+import { hostOf } from './url'
 
 // Чистая логика словаря: без браузерных API, чтобы тестировать в node.
 
@@ -45,13 +46,7 @@ export function pageSource(url: string, title: string): WordSource {
 
 /** Пусто — источника нет или адрес не разбирается */
 export function sourceHost(entry: DictionaryEntry): string {
-  if (!entry.sourceUrl) return ''
-
-  try {
-    return new URL(entry.sourceUrl).host
-  } catch {
-    return ''
-  }
+  return hostOf(entry.sourceUrl)
 }
 
 /** Ключ дедупликации: «Flash  of Light» и «flash of light» — одно слово */
