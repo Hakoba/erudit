@@ -64,3 +64,17 @@ npm run typecheck && npm run lint && npm test && npm run build
 ```
 
 Проверять расширение нужно и в Chrome, и в Firefox: сборки собираются раздельно.
+
+## Релиз
+
+```bash
+npm version patch          # бамп, закрытие раздела «Не выпущено» в CHANGELOG, тег
+git push --follow-tags
+npm run build
+set -a && . ./.env && set +a && npx chrome-webstore-upload-cli upload \
+  --source dist/chrome-$(node -p "require('./package.json').version").zip \
+  --publisher-id "$PUBLISHER_ID"
+```
+
+Пакет ложится в панель черновиком; отправка на проверку — кнопкой в панели.
+Переменные для загрузки описаны в `.env.example`. Версию в README обновлять руками.
