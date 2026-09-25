@@ -32,7 +32,7 @@ allow yourself.
 
 <p align="center">
   <img src="landing/img/overlay.png" width="840"
-       alt="A Reddit post with the hard words highlighted in the text and the side panel listing everything it found, with translations and levels" />
+       alt="A Wikipedia article with the hard words highlighted in the text and the side panel listing everything it found, with translations and levels" />
 </p>
 
 ## Why another one
@@ -67,12 +67,12 @@ goes almost quiet.
 
 <p align="center">
   <img src="landing/img/dictionary.png" width="840"
-       alt="The dictionary screen: saved words with their level, the sentence they came from and an explanation, plus search, level filter and Anki export" />
+       alt="The dictionary screen: saved words with their level, the sentence they came from and the source page, plus search, filters and Anki export" />
 </p>
 
 <p align="center">
   <img src="landing/img/training.png" width="840"
-       alt="A practice session: the word, the sentence it came from, the revealed translation and the Knew / Did not know buttons" />
+       alt="A practice session: the word, the sentence it came from, the revealed translation and the Remembered / Did not remember buttons" />
 </p>
 
 ## Install
