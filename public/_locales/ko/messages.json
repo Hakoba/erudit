@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Erudit: 읽으며 단어 배우기",
+    "description": "Extension name in the browser and the store"
+  },
+  "extDescription": {
+    "message": "읽으면서 어휘 학습: 모르는 단어 강조, 마우스 오버 번역, 개인 사전과 간격 반복.",
+    "description": "Store summary, up to 132 characters"
+  }
+}

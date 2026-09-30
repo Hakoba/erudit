@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Erudit：边读边学单词",
+    "description": "Extension name in the browser and the store"
+  },
+  "extDescription": {
+    "message": "边阅读边学词汇：高亮生词、悬停翻译、个人词典和间隔复习。",
+    "description": "Store summary, up to 132 characters"
+  }
+}

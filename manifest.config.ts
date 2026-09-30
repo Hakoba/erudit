@@ -2,7 +2,7 @@ import { env } from "node:process"
 import type { ManifestV3Export } from "@crxjs/vite-plugin"
 import packageJson from "./package.json" with { type: "json" }
 
-const { version, name, description, displayName } = packageJson
+const { version, name, displayName } = packageJson
 // Convert from Semver (example: 0.1.0-beta6)
 const [major, minor, patch, label = "0"] = version
   // can only contain digits, dots, or dash
@@ -11,8 +11,11 @@ const [major, minor, patch, label = "0"] = version
   .split(/[.-]/)
 
 export default {
-  name: env.mode === "staging" ? `[INTERNAL] ${name}` : displayName || name,
-  description,
+  // Название и описание — из `public/_locales/*/messages.json`: стор показывает их
+  // на языке пользователя, а краткое описание карточки берёт именно из манифеста
+  name: env.mode === "staging" ? `[INTERNAL] ${displayName || name}` : "__MSG_extName__",
+  description: "__MSG_extDescription__",
+  default_locale: "en",
   // up to four numbers separated by dots
   version: `${major}.${minor}.${patch}.${label}`,
   // semver is OK in "version_name"

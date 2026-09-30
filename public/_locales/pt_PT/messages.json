@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Erudit: aprenda palavras a ler",
+    "description": "Extension name in the browser and the store"
+  },
+  "extDescription": {
+    "message": "Aprenda vocabulário a ler: palavras novas destacadas, tradução ao passar o cursor, dicionário pessoal e revisão espaçada.",
+    "description": "Store summary, up to 132 characters"
+  }
+}

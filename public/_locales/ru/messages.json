@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Erudit: учите слова при чтении",
+    "description": "Extension name in the browser and the store"
+  },
+  "extDescription": {
+    "message": "Учите слова при чтении: подсветка незнакомых слов, перевод при наведении, личный словарь и повторение по интервалам.",
+    "description": "Store summary, up to 132 characters"
+  }
+}
