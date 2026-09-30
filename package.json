@@ -70,7 +70,7 @@
     "launch": "tsx scripts/launch.ts",
     "launch:all": "tsx scripts/launch.ts --all",
     "lint": "eslint . --fix --cache",
-    "lint:manifest": "web-ext lint --pretty",
+    "lint:manifest": "web-ext lint --source-dir dist/firefox --pretty",
     "test": "tsx --test \"src/**/*.test.ts\"",
     "typecheck": "vue-tsc --noEmit",
     "version": "node scripts/release.mjs && git add CHANGELOG.md"
